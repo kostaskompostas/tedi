@@ -15,7 +15,7 @@ const Welcome = (props) =>{
       },[])*/
     const submitForm=(e)=>{
         e.preventDefault();
-        axios.post("http://192.168.1.7:8000/api/user/",{
+        axios.post("/api/user/",{
             email : e.target.email.value,
             password : e.target.password.value
         }).then((response)=>{
