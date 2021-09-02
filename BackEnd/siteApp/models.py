@@ -37,8 +37,6 @@ class UserManager(BaseUserManager):
         return new_superuser;
 
 
-
-
 #Create custom user model for email login
 class User(AbstractUser):
 
