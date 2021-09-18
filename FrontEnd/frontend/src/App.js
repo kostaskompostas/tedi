@@ -4,7 +4,9 @@ import  axios from "axios";
 import Welcome  from './LoggedOut/Welcome';
 import React from 'react';
 
+
 axios.defaults.baseURL = "http://192.168.1.7:8000"
+
 function App() {
   
   return (
