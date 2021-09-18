@@ -5,8 +5,10 @@ import Welcome  from './LoggedOut/Welcome';
 import React from 'react';
 
 
-function App() {
+axios.defaults.baseURL = "http://192.168.1.7:8000"
 
+function App() {
+  
   return (
     <div className="App">
       <header className="App-header">
