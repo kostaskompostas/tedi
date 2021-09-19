@@ -185,6 +185,7 @@ class UserView(APIView):
         #After all the changes try to save the user
         try:
             request.user.save()
+            login(request,request.user)
             return Response(response_dict)
         except:
             return response_message(False,"Could not save user to the database")
