@@ -52,7 +52,6 @@ class User(AbstractUser):
 
     #User profile picture
     profile_picture = models.ImageField(upload_to="users/images/",null=True)
-
     #Collaborators are like "friends" in facebook
     #It's a many to many relationship
     collaborators = models.ManyToManyField("self");
