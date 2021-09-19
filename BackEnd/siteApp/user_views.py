@@ -112,6 +112,84 @@ class UserView(APIView):
         except:
             return response_message(False,"Could not save the new user into the database")
 
+    def put(self, request, format = None):
+        """This allows you to alter your core data, if you are a previously authenticated user"""
+
+        #Get the data of the request
+        request_data = request.data
+
+        #Check if you are authenticated first
+        if not request.user.is_authenticated:
+            return response_message(False,"You must be authenticated to alter your data")
+
+        #Then try to alter your data one by one and see if you run in an error
+        #Because these will happen individually, you will have a dictionary of messages for each thing you are trying to alter
+        response_dict = {}
+
+
+        #Try to change your email
+        if "user_email" in request_data:
+            
+            #Check if the new email is used by another person
+            if app_models.User.objects.filter(email = request_data['user_email']):
+                response_dict['user_email'] = {
+                    'changed':'false',
+                    'message':'email was in use by another user'
+                }
+            else:
+                request.user.email = request_data['user_email']
+                response_dict['user_email'] ={
+                    'changed':'true'
+                }
+        
+        if "user_password" in request_data:
+
+            #Change the user password
+            request.user.set_password(request_data['user_password'])
+            response_dict['user_password'] ={
+                'changed':'true'
+            }
+        
+        if "user_first_name" in request_data:
+
+            #Change his first name
+            request.user.first_name = request_data['user_first_name']
+            response_dict['user_first_name'] ={
+                'changed':'true'
+            }
+        
+        if "user_last_name" in request_data:
+
+            #Change his last name
+            request.user.last_name = request_data['user_last_name']
+            response_dict['user_last_name'] ={
+                'changed':'true'
+            }
+
+        if "user_phone" in request_data:
+
+            #Change his last name
+            request.user.phone = request_data['user_phone']
+            response_dict['user_phone'] ={
+                'changed':'true'
+            }
+
+        if "user_phone_private" in request_data:
+
+            #Change his last name
+            request.user.phone_private = True if request_data['user_phone_private'] == 'true' else False
+            response_dict['user_phone_private'] ={
+                'changed':'true'
+            }
+        
+        #After all the changes try to save the user
+        try:
+            request.user.save()
+            return Response(response_dict)
+        except:
+            return response_message(False,"Could not save user to the database")
+
+
 class AuthView(APIView):
     """This endpoint is used for logging users in and logging users out of the application"""
 
