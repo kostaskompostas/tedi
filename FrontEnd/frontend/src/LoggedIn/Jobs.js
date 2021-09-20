@@ -2,13 +2,10 @@ import {React,useEffect} from "react";
 import axios from "axios";
 
 
-const Welcome = (props) =>{
-
-
+const Jobs = (props) =>{
 
     return (
-        
-      <h1>Welcome</h1>
+        <h3>Jobs</h3>
     )
 }
-export default Welcome;
+export default Jobs;
