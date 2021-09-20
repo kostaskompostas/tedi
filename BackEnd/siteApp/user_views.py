@@ -383,3 +383,152 @@ class CollabView(APIView):
             return response_message(True,"Success, the collaboration request was "+text)
         except:
             return response_message(False,"Error deleting collab request from database")
+
+class SkillView(APIView):
+    """This endpoint allows for users to specify their skills and get a skill list"""
+
+    def convert_skill_to_dictionary(self,skill):
+
+        #Basic representation of the skill
+        return {
+            'skill_id': skill.id,
+            'skill_name': skill.name,
+            'skill_description': skill.description
+        }
+
+    def convert_userskill_to_dictionary(self,uskill,mode):
+
+        final_dict = {
+            'user_email': uskill.user.email,
+            'skill_id': uskill.skill.id,
+            'skill_level': uskill.level,
+        }
+
+        if mode != "other":
+            final_dict['skill_private'] = 'true' if uskill.private else 'false'
+        
+        return final_dict
+
+    def get(self,request,format=None):
+        """This will present a list of skills, which through their id's will be used by users to add them to their profile"""
+
+        #Parse the data of the request
+        request_data = request.query_params
+
+        #Check that the essential parameters are there
+        if not check_dict_contains_one_key(request_data,["all","user"]):
+            return response_message(False, "A required parameter is missing")
+
+        #Check if all the available skills need to be presented
+        if "all" in request_data:
+            
+            #Get and return the list of all available skills
+            return response_from_queryset(app_models.SkillType.objects.all(),self.convert_skill_to_dictionary)
+
+        if "user" in request_data:
+
+            #Check that you are logged in
+            if not request.user.is_authenticated:
+                return response_message(False,"You must be logged in to view your skills")
+            
+            user = request.user
+            show_private = True
+            mode = ""
+
+            #Check if another user email is presented
+            if "user_email" in request_data:
+
+
+                #Try to differentiate the user from the one he is viewing
+                try:
+                    user = app_models.User.objects.get(user_email=request_data['user_email'])
+                except:
+                    return response_message(False,"The user specified does not exist")
+                
+                #If the user is you, or a collaborator you are allowed to show private skills
+                show_private =  check_users_collaboration(request.user,user) or request.user == user
+                    
+
+            #Return a list of the skills you have added
+            priv = [True,False] if show_private else [False]
+
+
+            return response_from_queryset(app_models.UserSkill.objects.filter(user=request.user,private__in=priv),lambda x: self.convert_userskill_to_dictionary(x,mode))
+
+    def post(self,request,format=None):
+        """This allows users to add a skill from the available skills to their skillsets"""
+
+        #Parse the request data
+        request_data = request.data
+    
+        #Check that you are a logged in user
+        if not request.user.is_authenticated:
+            return response_message(False,"You must be an authenticated user to manage your skills")
+        
+        #Then check that the required parameters exists
+        if not check_dict_contains_keys(['skill_id','level']):
+            return response_message(False,"One of the required parameters is missiing")
+
+        #Check that the skill you are trying to add exists
+        skill = None
+        try:
+            skill = app_models.SkillType.objects.get(pk=int(request_data['skill_id']))
+        except:
+            return response_message(False,"The skill you are trying to add does not exist")
+
+        #Check if you have already registered that skill
+        uskill = None
+        try:
+            uskill = app_models.UserSkill.objects.get(skill=skill,user=request.user)
+        except:
+            #If it does not exist, create it at the spot
+            uskill = app_models.UserSkill
+            uskill.user = request.user
+            uskill.skill = skill
+
+        #Try to parse and add all the other parameters
+        try:
+            lv = int(request_data['level'])
+            private = "private" in request_data
+            if lv < 1 or lv > 10:
+                return response_message(False,"Skill level should be an integer between 1 and 10")
+            uskill.level = lv
+            uskill.private = private
+
+        except:
+            return response_message(False,"Error when parsing the parameters")
+
+        #Finally try to save to database
+        try:
+            uskill.save()
+            return response_message(True,"Skill added/altered successfully")
+        except:
+            return response_message(False,"Error saving user skill to database")
+
+    def delete(self, request,format=None):
+        """This allows users to delete a specific skill set they say they have"""
+
+        #Parse the request data
+        request_data = request.data
+
+        #Check that you are authenticated
+        if not request.user.is_authenticated:
+            return response_message(False,"You must be logged in to delete one of your skills")
+
+        #Check that the parameter is present
+        if not "skill_id" in request_data:
+            return response_message(False,"The required parameter is missing")
+
+        #Try to find the skill you are looking for
+        uskill = None
+        try:
+            uskill = app_models.UserSkill.objects.filter(user=request.user,skill__id=int(request_data['skill_id']))
+        except:
+            return response_message(False,'You have not set the skill you are trying to delete')
+        
+        #Finally try to delete the skill
+        try:
+            uskill.delete()
+            return response_message(True,"User skill deleted successfully")
+        except:
+            return response_message(False,"Error deleting user skill")
