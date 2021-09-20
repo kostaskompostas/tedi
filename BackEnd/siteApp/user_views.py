@@ -34,7 +34,6 @@ def convert_user_to_dictionary(user, see_private):
     #Return the complete dictionary
     return final_dict
 
-
 class UserView(APIView):
 
     """This endpoint is used for retrieving user infromation as well as creating new users"""
@@ -190,7 +189,6 @@ class UserView(APIView):
         except:
             return response_message(False,"Could not save user to the database")
 
-
 class AuthView(APIView):
     """This endpoint is used for logging users in and logging users out of the application"""
 
@@ -248,4 +246,140 @@ class AuthView(APIView):
 
             #Finaly send the success response
             return response_message(True,"You successfully logged out")
+    
+class CollabView(APIView):
+    """This class is used for making collaboration requests
+    Answering collaboration requests, and declining them
+    Also viewing you collaboration requests, and others that people have made to you"""
+
+    def convert_request_to_dictionary(self,collab,mode):
+        """This is for turning collaboration requests into
+        a serialized form"""
+
+        return {
+            'request_id':collab.id,
+            'user_from_email':collab.user_from.email,
+            'user_to_email': collab.user_to.email
+        }
+
+
+    def get(self, request, format = None):
+        """Through this call you can view your collaboration requests, and also those that other users have made to you. All is done through user ids"""
+
+        #Get the data of the request
+        request_data = request.query_params
+
+        #First check that you are logged in
+        if not request.user.is_authenticated:
+            return response_message(False, "You must be an authenticated user to view the collaborations")
+
+        mode = ""
+        if "mode" in request_data:
+            mode = request_data["mode"]
+
+        #Start without requests
+        req = None
+
+        #Check if you are viewing incoming requests
+        if "incoming" in request_data:
+
+            #Fetch all the request users have made to you
+            req = app_models.CollaborationRequest.objects.filter(user_to=request.user)
+        else:
             
+            #See the outgoing requests
+            req = app_models.CollaborationRequest.objects.filter(user_from=request.user)
+
+        #Return the requests in the form of list
+        return response_from_queryset(req,lambda x: self.convert_request_to_dictionary(x,mode))
+
+    def post(self, request, format=None):
+        """This allows for making collaboration requests, and also answering to requests made to you positively or negatively"""
+
+        #Parse the request data
+        request_data = request.data
+
+        #See if the essential parameters are there
+        if not check_dict_contains_one_key(request_data,["create","accept","decline","uncollab"]) or not check_dict_contains_keys(request_data,["user_email"]):
+            return response_message(False,"One of the required paremeters is missing")
+
+        #Get the user of the email
+        user = None
+        try:    
+            user = app_models.User.objects.get(email=request_data['user_email'])
+        except:
+            return response_message(False, "User not found")
+
+        #Check that you are authenticated
+        if not request.user.is_authenticated:
+            return response_message(False,"You are not logged in so you cannot deal with collaboration requests")
+
+        if "uncollab" in request_data:
+
+            #Check if you are collaborating with the user specified so you can end the collaboration
+            if not user in request.user.collaborators.all():
+                return response_message(False,"You are not collaborating with the user specified")
+            
+            #If you are collaborating, stop the collaboration and save the users
+            request.user.collaborators.remove(user)
+            user.collaborators.remove(request.user)
+
+            request.user.save()
+            user.save()
+
+            #Return the ok message
+            return response_message(True,"The collaboration has successfully ended")
+
+
+
+        if "create" in request_data:
+            
+            #Check if a request to that user is already there
+            if app_models.CollaborationRequest.objects.filter(user_from=request.user, user_to=user).count() != 0:
+                return response_message(False,"You have already sent a request to that user")
+            
+            #Check if you are already collaborating with the user
+            if check_users_collaboration(request.user,user):
+                return response_message(False,"You are already in collaboration with that user")
+
+            #If not create the request
+            try:
+                req = app_models.CollaborationRequest()
+                req.user_from = request.user
+                req.user_to = user
+                req.save()
+                return response_message(True, "Collaboration request send")
+            except:
+                return response_message(False,"Error saving the request to the database")
+
+        #If you reached here, then you can only accept or decline the request
+
+        #Check that such a request exists first
+        req = None
+        try:
+            req = app_models.CollaborationRequest.objects.get(user_from=user,user_to=request.user)
+        except:
+            return response_message(False,"You don't have an incoming request from that user")
+
+        #If you have a request, check if you need to make a collaborator
+        text = "rejected"
+        if "accept" in request_data:
+            
+            #Make collaborations
+            request.user.collaborators.add(user)
+            user.collaborators.add(request.user)
+
+            #Save the users
+            request.user.save()
+            user.save()
+
+            #Change the text
+            text = "accepted"
+
+
+        #Finally delete the collaboration request from the system
+        try:
+            req.delete()
+            return response_message(True,"Success, the collaboration request was "+text)
+        except:
+            return response_message(False,"Error deleting collab request from database")
