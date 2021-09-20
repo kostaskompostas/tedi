@@ -78,7 +78,13 @@ class EductationType(models.Model):
         -PHD
     """
 
+    #What is the name of the education level
     name = models.CharField(max_length=50)
+
+    #Defines of you can have this education more than once
+    #E.g. you can have 2 bachelor degrees
+    once = models.BooleanField()
+
 
 class UserEducation(models.Model):
     """This class allows for a user to specify an education he has been through
@@ -86,6 +92,9 @@ class UserEducation(models.Model):
 
     #Which user got the education
     user = models.ForeignKey(User,on_delete=models.CASCADE)
+
+    #Which type of education
+    education = models.ForeignKey(EductationType,on_delete=models.CASCADE)
 
     #Which school he graduated from
     institution_name = models.CharField(max_length=200)

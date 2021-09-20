@@ -506,6 +506,7 @@ class SkillView(APIView):
             return response_message(False,"Error saving user skill to database")
 
     def delete(self, request,format=None):
+
         """This allows users to delete a specific skill set they say they have"""
 
         #Parse the request data
@@ -532,3 +533,177 @@ class SkillView(APIView):
             return response_message(True,"User skill deleted successfully")
         except:
             return response_message(False,"Error deleting user skill")
+
+class EducationView(APIView):
+    """This endpoint provides a way for users to alter their educational info, as well as a way to access all the education types possible"""
+
+    def convert_education_type_to_dict(self,edtype):
+        """This converts an education type into a serialized form"""
+
+        return {
+            'education_id': edtype.id,
+            'education_name': edtype.name,
+            'education_once': 'true' if edtype.once else 'false'
+        }
+
+    def convert_user_education_to_dict(self,useredu,mode):
+        """This converts a user set education into a serialized form"""
+
+        final_dict = {
+            'user_email':useredu.user.email,
+            'useredu_id':useredu.id,
+            'education_id':useredu.education.id,
+            'education_name':useredu.education.name,
+            'instituition_name':useredu.institution_name
+        }
+
+        if mode != "other":
+            final_dict['private'] = 'true' if useredu.private else 'false'
+
+
+    def get(self, request,format=None):
+        """This is used to display all the education types or the education set by the user"""
+
+        #Parse the request data
+        request_data = request.query_params
+
+        #Check if the essential parameters are there
+        if not check_dict_contains_one_key(request_data,['all','user']):
+            return response_message(False,"One of the required parameters is missing")
+
+        #Check if you want the list of education types
+        if "all" in request_data:
+
+            #Return a response with the list of education types
+            return response_from_queryset(app_models.EductationType.objects.all(),self.convert_education_type_to_dict)
+        
+        if "user" in request_data:
+
+            #Check if you are authenticated
+            if not request.user.is_authenticated:
+                return response_message(False,"You must be authenticated to view the user education")
+
+            #Check if you want to see another users data
+            user = request.user
+            if "user_email" in request_data:
+                try:
+                    user = app_models.User.objects.get(email=request_data['user_email'])
+                except:
+                    return response_message(False,"The user email specified does not belong to an existing user")
+
+            #Check if you can show private fields and determine the mode
+            mode = "you" if user == request.user else "other"
+            show_private = mode = "you" or check_users_collaboration(user,request.user)
+
+            #Finally return the list of user education
+            priv = [True,False] if show_private else [False]
+            return response_from_queryset(app_models.UserEducation.objects.filter(user=user,private__in=priv),lambda x: self.convert_user_education_to_dict(x,mode))
+
+    def post(self, request, format=None):
+        """This allows the user to specify a new education"""
+
+        #Parse the request data
+        request_data = request.data
+
+        #Check that you are authenticated
+        if not request.user.is_authenticated:
+            return response_message(False,"You are not logged in so you cannot add educational data")
+
+        #Check that the essential parameters exist
+        if not check_dict_contains_keys(request_data,['education_id','institution_name']):
+            return response_message(False,"One of the required parameters is missing")
+
+        #Check that there is an education type of this ide
+        education = None
+        try:
+            education = app_models.EductationType.objects.get(pk=int(request_data['education_id']))
+        except:
+            return response_message(False,"The id does not correspond to an eductation type")
+
+        #Check if you already have an education level when the type states once
+        if education.once and app_models.UserEducation.objects.filter(user=request.user,education=education).count() != 0:
+            return response_message(False,"You have already stated educational info and only one is allowed for this type of education")
+        
+        #If all is good, create the new education object and save it
+        try:
+            useredu = app_models.UserEducation()
+            useredu.user=request.user
+            useredu.education=education
+            useredu.institution_name = request_data['institution_name']
+            useredu.private = "private" in request_data
+
+            useredu.save()
+            return response_message(True,'User education added successfully')
+        except:
+            return response_message(False,"Error when saving user education to database")
+
+    def put(self, request, format=None):
+        """This is for altering an existing user education data"""
+
+        #Parse the parameters
+        request_data = request.data
+
+        #Check that you are authenticated
+        if not request.user.is_authenticated:
+            return response_message(False,"You are not an authenticated user and cannot alter the user education data")
+
+        #If you are indeed authenticated, check if all the parameters exist
+        if "useredu_id" not in request_data:
+            return response_message(False, "One of the required parameters is missing")
+        
+        #If it is not missing, try to fetch the user education
+        useredu = None
+        try:
+            useredu = app_models.UserEducation.objects.get(pk=int(request_data['useredu_id']))
+        except:
+            return response_message(False,"The id does not correpond to a user education entity")
+
+        #If you got the user education, check that you are the correct user for that
+        if not request.user == useredu.user:
+            return response_message(False,"This user education does not belong to the currently logged in user")
+
+        #If all that is done, change the parameters at will
+        if "institution_name" in request_data:
+            useredu.institution_name = request_data['institution_name']
+
+        if "private" in request_data:
+            useredu.private = True if "private" == 'true' else False
+
+        #Finally try to save the altered data
+        try:
+            useredu.save()
+            return response_message(True, "User education was altered successfully")
+        except:
+            return response_message(False,"Error while saving user education to database")
+
+    def delete(self, request, format=None):
+        """This is for deleting an existing user education data"""
+
+        #Parse the parameters
+        request_data = request.data
+
+        #Check that you are authenticated
+        if not request.user.is_authenticated:
+            return response_message(False,"You are not an authenticated user and cannot alter the user education data")
+
+        #If you are indeed authenticated, check if all the parameters exist
+        if "useredu_id" not in request_data:
+            return response_message(False, "One of the required parameters is missing")
+        
+        #If it is not missing, try to fetch the user education
+        useredu = None
+        try:
+            useredu = app_models.UserEducation.objects.get(pk=int(request_data['useredu_id']))
+        except:
+            return response_message(False,"The id does not correpond to a user education entity")
+
+        #If you got the user education, check that you are the correct user for that
+        if not request.user == useredu.user:
+            return response_message(False,"This user education does not belong to the currently logged in user")
+        
+        #After all this is done, try to delete it
+        try:
+            useredu.delete()
+            return response_message(True,"User education deleted successfully")
+        except:
+            return response_message(False,"Error while deleting user education")
