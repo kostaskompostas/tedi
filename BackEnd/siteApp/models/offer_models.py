@@ -20,6 +20,9 @@ class Offer(models.Model):
     #Who is making the offer
     author = models.ForeignKey(User,on_delete=models.CASCADE, null = False)
 
+    #A suitable name for the offer
+    name = models.CharField(max_length=60)
+
     #What the offer is about
     description = models.TextField(max_length=1024,null = False)
 
@@ -27,7 +30,9 @@ class Offer(models.Model):
     price = models.PositiveIntegerField()
     pay_method = models.ForeignKey(PayMethod,on_delete=models.SET(get_default_pay_method),null=True)
 
-    #Boolean that indicates if the offer has been filled
+    #This is a variable that states weather the offer was filled by a user
+    #It is a foreign key to a user that filled the offer,
+    #If set to null it means the offer has not yet been filled
     filled = models.BooleanField()
 
 class OfferInterest(models.Model):
