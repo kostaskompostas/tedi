@@ -12,7 +12,7 @@ class PayMethod(models.Model):
     name = models.CharField(max_length=30)
 
 def get_default_pay_method():
-    return PayMethod.objects.get_or_create(codename='nopay',name='No payment')[0]
+    return PayMethod.objects.get_or_create(codename='onetime',name='One time payment')[0]
 
 class Offer(models.Model):
     """This represents an offer done by a specific user"""
