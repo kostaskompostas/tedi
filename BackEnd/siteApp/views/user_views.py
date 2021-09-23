@@ -469,7 +469,7 @@ class SkillView(APIView):
 
                 #Try to differentiate the user from the one he is viewing
                 try:
-                    user = app_models.User.objects.get(user_email=request_data['user_email'])
+                    user = app_models.User.objects.get(email=request_data['user_email'])
                 except:
                     return response_message(False,"The user specified does not exist")
                 
@@ -481,7 +481,7 @@ class SkillView(APIView):
             priv = [True,False] if show_private else [False]
 
 
-            return response_from_queryset(app_models.UserSkill.objects.filter(user=request.user,private__in=priv),lambda x: self.convert_userskill_to_dictionary(x,mode))
+            return response_from_queryset(app_models.UserSkill.objects.filter(user=user,private__in=priv),lambda x: self.convert_userskill_to_dictionary(x,mode))
 
     def post(self,request,format=None):
         """This allows users to add a skill from the available skills to their skillsets"""
@@ -494,7 +494,7 @@ class SkillView(APIView):
             return response_message(False,"You must be an authenticated user to manage your skills")
         
         #Then check that the required parameters exists
-        if not check_dict_contains_keys(['skill_id','level']):
+        if not check_dict_contains_keys(request_data,['skill_id','level']):
             return response_message(False,"One of the required parameters is missiing")
 
         #Check that the skill you are trying to add exists
@@ -510,9 +510,10 @@ class SkillView(APIView):
             uskill = app_models.UserSkill.objects.get(skill=skill,user=request.user)
         except:
             #If it does not exist, create it at the spot
-            uskill = app_models.UserSkill
+            uskill = app_models.UserSkill()
             uskill.user = request.user
             uskill.skill = skill
+
 
         #Try to parse and add all the other parameters
         try:
@@ -530,8 +531,8 @@ class SkillView(APIView):
         try:
             uskill.save()
             return response_message(True,"Skill added/altered successfully")
-        except:
-            return response_message(False,"Error saving user skill to database")
+        except Exception as e:
+            return response_message(False,"Error saving user skill to database("+str(type(e))+")")
 
     def delete(self, request,format=None):
 
@@ -588,6 +589,7 @@ class EducationView(APIView):
         if mode != "other":
             final_dict['private'] = 'true' if useredu.private else 'false'
 
+        return final_dict
 
     def get(self, request,format=None):
         """This is used to display all the education types or the education set by the user"""

@@ -23,5 +23,5 @@ urlpatterns = [
     path('api/auth/',views.AuthView.as_view(),name = 'signup'),
     path('api/user/',views.UserView.as_view(),name = 'user'),
     path('api/skills/',views.SkillView.as_view(),name="skills"),
-    path('api/education',views.EducationView.as_view(), name = "edu")
+    path('api/edu/',views.EducationView.as_view(), name = "education")
 ]
