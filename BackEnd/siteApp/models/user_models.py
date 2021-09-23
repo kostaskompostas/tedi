@@ -85,6 +85,10 @@ class EductationType(models.Model):
     #E.g. you can have 2 bachelor degrees
     once = models.BooleanField(null=True)
 
+    #To make it easier on the admin page
+    def __str__(self):
+        return self.name
+
 
 class UserEducation(models.Model):
     """This class allows for a user to specify an education he has been through
@@ -113,6 +117,10 @@ class SkillType(models.Model):
 
     #A small description of the skill
     description = models.TextField(max_length = 300)
+
+    #To make it easier on the admin page
+    def __str__(self):
+        return self.name
 
 class UserSkill(models.Model):
     """This is a specific skill owned by a specific user, as well as
