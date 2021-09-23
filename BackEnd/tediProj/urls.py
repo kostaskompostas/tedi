@@ -19,5 +19,6 @@ from siteApp import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/user/',views.UserView.as_view(),name = 'signup'),
+    path('api/auth/',views.AuthView.as_view(),name = 'signup'),
+    path('api/user/',views.UserView.as_view(),name = 'user')
 ]

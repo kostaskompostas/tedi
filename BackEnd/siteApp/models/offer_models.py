@@ -6,10 +6,10 @@ class PayMethod(models.Model):
     will be able to offer when he is making an offer to other users"""
 
     #Code name to be used in code only as a key for the method
-    codename = models.CharField(max_length=20)
+    codename = models.CharField(max_length=20,null=True)
 
     #Display name that is used to say to the users what the mode is about
-    name = models.CharField(max_length=30)
+    name = models.CharField(max_length=30,null=True)
 
 def get_default_pay_method():
     return PayMethod.objects.get_or_create(codename='onetime',name='One time payment')[0]
@@ -21,7 +21,7 @@ class Offer(models.Model):
     author = models.ForeignKey(User,on_delete=models.CASCADE, null = False)
 
     #A suitable name for the offer
-    name = models.CharField(max_length=60)
+    name = models.CharField(max_length=60,null=True)
 
     #What the offer is about
     description = models.TextField(max_length=1024,null = False)

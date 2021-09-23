@@ -79,11 +79,11 @@ class EductationType(models.Model):
     """
 
     #What is the name of the education level
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=50,null=True)
 
     #Defines of you can have this education more than once
     #E.g. you can have 2 bachelor degrees
-    once = models.BooleanField()
+    once = models.BooleanField(null=True)
 
 
 class UserEducation(models.Model):
@@ -94,10 +94,10 @@ class UserEducation(models.Model):
     user = models.ForeignKey(User,on_delete=models.CASCADE)
 
     #Which type of education
-    education = models.ForeignKey(EductationType,on_delete=models.CASCADE)
+    education = models.ForeignKey(EductationType,on_delete=models.CASCADE,null=True)
 
     #Which school he graduated from
-    institution_name = models.CharField(max_length=200)
+    institution_name = models.CharField(max_length=200,null=True)
 
     #Wether this information be private for non collaborators
     private = models.BooleanField()

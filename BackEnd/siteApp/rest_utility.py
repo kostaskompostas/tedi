@@ -14,11 +14,13 @@ def response_from_queryset(qset, converter):
     for item in qset:
         item_list.append(converter(item))
 
-    final_response = {
+    final_response = Response({
         'success':'true',
         'item_no':qset.count(),
         'items':item_list
-    }
+    })
+
+    return final_response
 
 
 

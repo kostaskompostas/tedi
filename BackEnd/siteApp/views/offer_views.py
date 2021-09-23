@@ -2,7 +2,7 @@
 #SOMEONE TO WORK ON YOUR OFFER
 
 from ..rest_utility import *
-import models as app_models
+import siteApp.models as app_models
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .user_views import convert_user_to_dictionary, check_users_collaboration

@@ -1,8 +1,9 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .rest_utility import *
+from rest_framework.authtoken.models import Token
+from ..rest_utility import *
 from django.contrib.auth import authenticate,login,logout
-import models as app_models
+import siteApp.models as app_models
 
 
 def check_users_collaboration(user1,user2):
@@ -38,8 +39,6 @@ class UserView(APIView):
 
     """This endpoint is used for retrieving user infromation as well as creating new users"""
 
-
-
     def get(self, request, format = None):
         """This will return a list of users, or a specific user depending on parameters provided"""
 
@@ -51,7 +50,7 @@ class UserView(APIView):
 
             #Try to get the user specified
             try:
-                user = app_models.User.objects.get(email = request_data("user_email"))
+                user = app_models.User.objects.get(email = request_data["user_email"])
             except:
                 return response_message(False, "User was not found")
             
@@ -72,10 +71,14 @@ class UserView(APIView):
         
         Authenticated admin users can create other admin users"""
 
+        #Check that you are not logged in
+        if request.user.is_authenticated and not request.user.is_superuser:
+            return response_message(False,"You cannot create another user while you are logged in. (Except for admins)")
+
         request_data = request.data
 
         #Check if all the required keys are there
-        if not check_dict_contains_keys(request_data,["user_email","user_phone","user_first_name","user_last_name"]):
+        if not check_dict_contains_keys(request_data,["user_email","user_phone","user_first_name","user_last_name","user_password"]):
             return response_message(False,"One of the required parameters for creating a user is missing")
 
         #Validate all the information passed on
@@ -97,6 +100,7 @@ class UserView(APIView):
         #Create the new user with the information provided
         new_user = app_models.User()
         new_user.email = request_data['user_email']
+        new_user.set_password(request_data['user_password'])
         new_user.first_name = request_data['user_first_name']
         new_user.last_name = request_data['user_last_name']
         new_user.phone = request_data['user_phone']
@@ -107,6 +111,11 @@ class UserView(APIView):
         #Save the new user to the database and return a success
         try:
             new_user.save()
+            
+            #Log him in
+            if not request.user.is_authenticated:
+                login(request,user=new_user)
+
             return response_message(True,"The new user was created successfully")
         except:
             return response_message(False,"Could not save the new user into the database")
@@ -199,8 +208,12 @@ class AuthView(APIView):
 
             #If you are logged in, return all your information
             return Response(convert_user_to_dictionary(request.user,True))
+
         
         else:
+            
+            if request.auth != None:
+                print(request.auth)
 
             return response_message(False,"You are not currently logged in")
 
@@ -231,7 +244,16 @@ class AuthView(APIView):
             if not user == None:
                 #Log the authenticated user in, and return the success response
                 login(request,user=user)
-                return response_message(True,"Login successful")
+
+                #Create a token for the authenticated user
+                token = Token.objects.get_or_create(user=user)[0]
+
+                return Response({
+                    'success':'true',
+                    'token':token.key,
+                    'message':'Login Successful'
+                })
+                #return response_message(True,"Login successful")
             else:
                 return response_message(False,"Wrong credentials")
         
@@ -242,7 +264,13 @@ class AuthView(APIView):
                 return response_message(False,"You are not currently logged in")
 
             #If you are logged in, log yourself out
-            logout(user=request.user)
+            logout(request)
+
+            #Delete the token if there is one
+            try:
+                Token.objects.get(user=request.user).delete()
+            except:
+                pass
 
             #Finaly send the success response
             return response_message(True,"You successfully logged out")
