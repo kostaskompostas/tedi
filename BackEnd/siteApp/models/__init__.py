@@ -4,3 +4,4 @@ from .user_models import *
 from .collab_models import *
 from .offer_models import *
 from .article_models import *
+from .messaging_models import *

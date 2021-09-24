@@ -3,7 +3,9 @@ from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from ..rest_utility import *
 from django.contrib.auth import authenticate,login,logout
+from rest_framework.parsers import FormParser,MultiPartParser
 import siteApp.models as app_models
+from ..serializers import *
 
 
 def check_users_collaboration(user1,user2):
@@ -36,6 +38,9 @@ def convert_user_to_dictionary(user, see_private):
     return final_dict
 
 class UserView(APIView):
+
+    #  In theory these parsers are already been used by the django rest framework
+    parser_classes = [FormParser,MultiPartParser]
 
     """This endpoint is used for retrieving user infromation as well as creating new users"""
 
@@ -190,6 +195,18 @@ class UserView(APIView):
                 'changed':'true'
             }
         
+        if "user_image" in request_data:
+
+            #Try to change the picture with the serializer
+            checkser =  UserPictureSerializer(data={"profile_picture":request_data["user_image"]})
+
+            if not  checkser.is_valid():
+                return response_message(False,"The image you uploaded is corrupted or not an image")
+
+            #If all is good replace the image
+            request.user.profile_picture = request_data['user_image']
+            
+
         #After all the changes try to save the user
         try:
             request.user.save()

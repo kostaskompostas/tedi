@@ -3,6 +3,16 @@
 
 from rest_framework.response import Response
 
+def list_from_queryset(qset, converter):
+    """This will convert a queryset into a list of dictionaries"""
+
+    #Create the list of converted items
+    item_list = []
+    for item in qset:
+        item_list.append(converter(item))
+    
+    return item_list
+
 def response_from_queryset(qset, converter):
     """This will create a list response from a queryset of items
     
@@ -10,9 +20,7 @@ def response_from_queryset(qset, converter):
     acting as a custom serialiser"""
 
     #Create the list of converted items
-    item_list = []
-    for item in qset:
-        item_list.append(converter(item))
+    item_list = list_from_queryset(qset,converter)
 
     final_response = Response({
         'success':'true',

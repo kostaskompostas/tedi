@@ -36,6 +36,10 @@ class UserManager(BaseUserManager):
         return new_superuser;
 
 
+#Image upload function for profile pictures
+def upload_profile_picture(instance,filename):
+    return 'user/images/'+filename
+
 #Create custom user model for email login
 class User(AbstractUser):
 
@@ -54,7 +58,7 @@ class User(AbstractUser):
     profile_picture = models.ImageField(upload_to="users/images/",null=True)
     #Collaborators are like "friends" in facebook
     #It's a many to many relationship
-    collaborators = models.ManyToManyField("self");
+    collaborators = models.ManyToManyField("self",blank=True);
 
     #Set the username field as the login credential
     USERNAME_FIELD = 'email'

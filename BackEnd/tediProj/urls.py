@@ -17,6 +17,8 @@ from siteApp.views.user_views import SkillView
 from django.contrib import admin
 from django.urls import path
 from siteApp import views
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -24,4 +26,10 @@ urlpatterns = [
     path('api/user/',views.UserView.as_view(),name = 'user'),
     path('api/skills/',views.SkillView.as_view(),name="skills"),
     path('api/edu/',views.EducationView.as_view(), name = "education")
+
 ]
+
+
+urlpatterns.extend(
+    static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
+)
