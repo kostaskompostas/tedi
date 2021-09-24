@@ -31,6 +31,9 @@ const SignIn = (props) => {
                     console.log(response.data)
                     if (response.data.success == "true") {
                         props.SignIn(response.data.token)
+                        console.log(
+                            "sign in token " + props.myHelper.GetToken()
+                        )
                     }
                 },
                 (error) => {

@@ -1,8 +1,10 @@
-import { React, useEffect } from "react"
+import { React, useEffect, useState } from "react"
 import axios from "axios"
 import samuel from "../icons/samuel.jpg"
 import profilePic from "../icons/profile.png"
+import Helper from "../util/Helper"
 const Home = (props) => {
+    let client = props.myHelper.client
     const getConnections = () => {
         let connections = [
             { name: "Johnathan", surname: "Joestar" },
@@ -24,6 +26,24 @@ const Home = (props) => {
         ]
         return connections
     }
+    const [userInfo, setUserInfo] = useState("")
+    useEffect(() => {
+        var token = props.myHelper.GetToken()
+        console.log(token)
+        client
+            .get("/api/auth/", {
+                headers: { Authorization: "Token " + token },
+            })
+            .then(
+                (response) => {
+                    console.log(response.data)
+                    setUserInfo(response.data)
+                },
+                (error) => {
+                    console.log(error)
+                }
+            )
+    }, [])
     const profile = () => {
         const connStyle = {
             overflowY: "auto",
@@ -32,6 +52,7 @@ const Home = (props) => {
             height: "400px",
             position: "relative",
         }
+
         return (
             <div className="d-flex flex-column align-items-start">
                 <div className="d-flex flex-column bg-info p-3 border border-dark rounded">
@@ -40,7 +61,13 @@ const Home = (props) => {
                             <img src={samuel} width="80px" height="80px" />
                             <div className="ps-3">
                                 <h4>Welcome,</h4>
-                                <h3>Samuel Hayden</h3>
+                                <h3>
+                                    {userInfo == ""
+                                        ? "loading"
+                                        : userInfo.first_name +
+                                          " " +
+                                          userInfo.last_name}
+                                </h3>
                             </div>
                         </div>
                         <div>
@@ -69,6 +96,7 @@ const Home = (props) => {
             </div>
         )
     }
+
     const timeLine = () => {
         const postStyle = {
             width: "500px",

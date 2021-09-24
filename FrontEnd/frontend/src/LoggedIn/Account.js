@@ -1,8 +1,9 @@
-import { React, useEffect } from "react"
+import { React, useEffect, useState } from "react"
 import axios from "axios"
 import FormInput from "../util/util.js"
 import samuel from "../icons/samuel.jpg"
 const Account = (props) => {
+    let client = props.myHelper.client
     let profile = { name: "Samuel", surname: "Hayden" }
     const listStyle = {
         overflowY: "auto",
@@ -36,7 +37,24 @@ const Account = (props) => {
         let skills = ["video editing", "music producing", "meme making"]
         return skills
     }
-
+    const [userInfo, setUserInfo] = useState("")
+    useEffect(() => {
+        var token = props.myHelper.GetToken()
+        console.log(token)
+        client
+            .get("/api/auth/", {
+                headers: { Authorization: "Token " + token },
+            })
+            .then(
+                (response) => {
+                    console.log(response.data)
+                    setUserInfo(response.data)
+                },
+                (error) => {
+                    console.log(error)
+                }
+            )
+    }, [])
     const displayList = (type, array, title) => {
         return (
             <div className="d-flex flex-column align-items-start ms-3">
@@ -67,12 +85,17 @@ const Account = (props) => {
                     <div className="d-flex p-2 align-items-end">
                         <img src={samuel} width="80px" height="80px" />
                         <div className="ps-3 d-flex">
-                            {FormInput("Name", "text", "name", profile.name)}
+                            {FormInput(
+                                "Name",
+                                "text",
+                                "name",
+                                userInfo.first_name
+                            )}
                             {FormInput(
                                 "Surname",
                                 "text",
                                 "surname",
-                                profile.surname,
+                                userInfo.last_name,
                                 "ms-2"
                             )}
                         </div>

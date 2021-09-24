@@ -7,33 +7,36 @@ import axios from "axios"
 import LoggedOutRouter from "./LoggedOut/LoggedOutRouter"
 import LoggedInRouter from "./LoggedIn/LoggedInRouter"
 import Helper from "./util/Helper"
-function App() {
-    const [logged, setLogged] = useState(false)
-    const [token, setToken] = useState("")
+import { render } from "@testing-library/react"
+class App extends Component {
+    state = { logged: false, token: true, helper: new Helper() }
 
-    let myHelper = new Helper()
-    const SignIn = (newToken) => {
-        setLogged(true)
-        setToken(newToken)
+    SignIn = (newToken) => {
+        this.setState({ logged: true })
+        console.log(this.logged)
+        this.state.helper.SetToken(newToken)
         ;<Redirect push to="/home" />
     }
 
-    const SignOut = () => {
-        console.log(token)
-        myHelper.client
+    SignOut = () => {
+        this.state.helper.client
             .post(
                 "/api/auth/",
                 {
                     logout: true,
                     format: "json",
                 },
-                { headers: { Authorization: "Token " + token } }
+                {
+                    headers: {
+                        Authorization: "Token " + this.state.helper.GetToken(),
+                    },
+                }
             )
             .then(
                 (response) => {
                     console.log(response.data.message)
-                    setToken("")
-                    setLogged(false)
+                    this.setState({ token: "" })
+                    this.setState({ logged: false })
                 },
                 (error) => {
                     console.log(error)
@@ -42,17 +45,25 @@ function App() {
         ;<Redirect push to="/" />
     }
 
-    const GetContent = () => {
-        let content = logged ? (
-            <LoggedInRouter SignOut={SignOut} />
+    GetContent() {
+        let content = this.state.logged ? (
+            <LoggedInRouter
+                myHelper={this.state.helper}
+                SignOut={this.SignOut}
+            />
         ) : (
-            <LoggedOutRouter SignIn={SignIn} />
+            <LoggedOutRouter
+                myHelper={this.state.helper}
+                SignIn={this.SignIn}
+            />
         )
 
         return content
     }
 
-    return GetContent()
+    render() {
+        return this.GetContent()
+    }
 }
 
 export default App

@@ -22,7 +22,7 @@ import {
     Redirect,
 } from "react-router-dom"
 
-const LoggedInRouter = (routerProps) => {
+const LoggedInRouter = (props) => {
     const [projectId, setProjectId] = useState(0)
     const [sprintId, setSprintId] = useState(0)
 
@@ -38,31 +38,53 @@ const LoggedInRouter = (routerProps) => {
 /project/:projectid/sprint/:sprintid
 /project/:projectid/sprint/retro
 */
+    console.log(props.myHelper.GetToken())
 
     let url = window.location.href
     let path = window.location.pathname
     return (
         <Router>
             <div>
-                <NavBar SignOut={routerProps.SignOut} />
+                <NavBar SignOut={props.SignOut} />
                 <Switch>
                     <Route exact path="/">
                         <Redirect to={"/home"}></Redirect>
                     </Route>
-                    <Route path={`/home`} render={() => <Home />} />
-                    <Route path={`/network`} render={() => <Network />} />
-                    <Route path={"/jobs"} render={() => <Jobs />} />
+                    <Route
+                        path={`/home`}
+                        render={() => (
+                            <Home peos={"big"} myHelper={props.myHelper} />
+                        )}
+                    />
+                    <Route
+                        path={`/network`}
+                        render={() => <Network myHelper={props.myHelper} />}
+                    />
+                    <Route
+                        path={"/jobs"}
+                        render={() => <Jobs myHelper={props.myHelper} />}
+                    />
                     <Route
                         path={"/conversations"}
-                        render={() => <Conversations />}
+                        render={() => (
+                            <Conversations myHelper={props.myHelper} />
+                        )}
                     />
 
                     <Route
                         path={"/notifications"}
-                        render={() => <Notifications />}
+                        render={() => (
+                            <Notifications myHelper={props.myHelper} />
+                        )}
                     />
-                    <Route path={"/account"} render={() => <Account />} />
-                    <Route path={"/settings"} render={() => <Settings />} />
+                    <Route
+                        path={"/account"}
+                        render={() => <Account myHelper={props.myHelper} />}
+                    />
+                    <Route
+                        path={"/settings"}
+                        render={() => <Settings myHelper={props.myHelper} />}
+                    />
                 </Switch>
             </div>
         </Router>
