@@ -64,7 +64,7 @@ const NavBar = (props) => {
                     </li>
                 </Link>
 
-                <li>
+                <li key="pages">
                     <ul className="d-flex ms-5 me-5">
                         {pages.map((page) => (
                             <Link style={navStyle} to={page.url}>
@@ -105,7 +105,7 @@ const NavBar = (props) => {
                 ))}
                 <li>
                     <button
-                        onClick={props.signout}
+                        onClick={props.SignOut}
                         value="log out"
                         className="btn btn-danger "
                     >

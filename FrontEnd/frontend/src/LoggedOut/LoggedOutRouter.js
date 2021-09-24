@@ -22,11 +22,11 @@ const LoggedOutRouter = (props) => {
                     <Route path="/home" render={() => <Welcome />} />
                     <Route
                         path="/signup"
-                        render={() => <SignUp signin={props.signin} />}
+                        render={() => <SignUp SignIn={props.SignIn} />}
                     />
                     <Route
                         path="/signin"
-                        render={() => <SignIn signin={props.signin} />}
+                        render={() => <SignIn SignIn={props.SignIn} />}
                     />
                 </Switch>
             </div>

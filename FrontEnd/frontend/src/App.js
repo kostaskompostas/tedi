@@ -6,29 +6,47 @@ import axios from "axios"
 
 import LoggedOutRouter from "./LoggedOut/LoggedOutRouter"
 import LoggedInRouter from "./LoggedIn/LoggedInRouter"
-
-axios.defaults.baseURL = "http://192.168.1.7:8000"
-
+import Helper from "./util/Helper"
 function App() {
     const [logged, setLogged] = useState(false)
+    const [token, setToken] = useState("")
 
-    const SignIn = () => {
-        console.log("logging in")
+    let myHelper = new Helper()
+    const SignIn = (newToken) => {
         setLogged(true)
+        setToken(newToken)
         ;<Redirect push to="/home" />
     }
 
     const SignOut = () => {
-        console.log("logging out")
-        setLogged(false)
+        console.log(token)
+        myHelper.client
+            .post(
+                "/api/auth/",
+                {
+                    logout: true,
+                    format: "json",
+                },
+                { headers: { Authorization: "Token " + token } }
+            )
+            .then(
+                (response) => {
+                    console.log(response.data.message)
+                    setToken("")
+                    setLogged(false)
+                },
+                (error) => {
+                    console.log(error)
+                }
+            )
         ;<Redirect push to="/" />
     }
 
     const GetContent = () => {
         let content = logged ? (
-            <LoggedInRouter signout={SignOut} />
+            <LoggedInRouter SignOut={SignOut} />
         ) : (
-            <LoggedOutRouter signin={SignIn} />
+            <LoggedOutRouter SignIn={SignIn} />
         )
 
         return content

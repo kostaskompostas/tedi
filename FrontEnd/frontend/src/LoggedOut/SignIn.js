@@ -1,6 +1,6 @@
 import React, { Component } from "react"
 import { useEffect } from "react"
-
+import Helper from "../util/Helper"
 import axios from "axios"
 import { NavLink, Link } from "react-router-dom"
 import { propTypes } from "react-bootstrap/esm/Image"
@@ -16,17 +16,22 @@ const SignIn = (props) => {
           console.log(e);
         }
       },[])*/
-
+    let myHelper = new Helper()
     const submitForm = (e) => {
         e.preventDefault()
-        axios
-            .post("/api/user/", {
-                email: e.target.email.value,
-                password: e.target.password.value,
+        myHelper.client
+            .post("/api/auth/", {
+                login: true,
+                user_email: e.target.email.value,
+                user_password: e.target.password.value,
+                format: "json",
             })
             .then(
                 (response) => {
-                    console.log(response.data.status)
+                    console.log(response.data)
+                    if (response.data.success == "true") {
+                        props.SignIn(response.data.token)
+                    }
                 },
                 (error) => {
                     console.log(error)
@@ -64,14 +69,13 @@ const SignIn = (props) => {
                                 />
                             </div>
                         </div>
+                        <button
+                            className="form-input-btn btn btn-primary btn-sm mt-3"
+                            type="submit"
+                        >
+                            Log in
+                        </button>
                     </form>
-                    <button
-                        onClick={props.signin}
-                        className="form-input-btn btn btn-primary btn-sm mt-3"
-                        type="submit"
-                    >
-                        Log in
-                    </button>
                 </div>
                 <div className="mt-3">
                     Already have an account?

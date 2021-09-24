@@ -44,7 +44,7 @@ const LoggedInRouter = (routerProps) => {
     return (
         <Router>
             <div>
-                <NavBar signout={routerProps.signout} />
+                <NavBar SignOut={routerProps.SignOut} />
                 <Switch>
                     <Route exact path="/">
                         <Redirect to={"/home"}></Redirect>
