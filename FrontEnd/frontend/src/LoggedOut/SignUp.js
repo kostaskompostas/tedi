@@ -109,17 +109,21 @@ const SignUp = (props) => {
                                     />
                                 </div>
                             </div>
-                            <div className="mt-4 d-flex flex-column">
-                                <label className="form-label">
-                                    Upload a profile Picture
-                                </label>
+                            {/*
+                                <div className="mt-4 d-flex flex-column">
+                                    <label className="form-label">
+                                        Upload a profile Picture
+                                    </label>
 
-                                <input
-                                    className="form-input"
-                                    type="file"
-                                    name="picture"
-                                />
-                            </div>
+                                    <input
+                                        className="form-input"
+                                        type="file"
+                                        name="picture"
+                                    />
+                                </div>
+                            
+                            */}
+
                             <div className="d-flex flex-column mt-4">
                                 <label className="form-label">
                                     Phone Number

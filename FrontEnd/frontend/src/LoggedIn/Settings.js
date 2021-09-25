@@ -35,11 +35,10 @@ const Settings = (props) => {
                 {
                     user_email: e.target.email.value,
                     user_password: e.target.password.value,
-                    format: "json",
                 },
                 {
                     headers: {
-                        Authorization: "Token" + props.myHelper.GetToken(),
+                        Authorization: "Token " + props.myHelper.GetToken(),
                     },
                 }
             )

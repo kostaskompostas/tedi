@@ -2,11 +2,12 @@ import React, { Component, useState } from "react"
 import axios from "axios"
 
 class Helper {
+    base = "http://localhost:8000" //"http://192.168.1.1:8000"
     token = ""
     client = axios.create({
-        baseURL: "http://127.0.0.1:8000",
+        //baseURL: "http://127.0.0.1:8000",
 
-        //baseURL: "http://192.168.1.35:8000",
+        baseURL: this.base,
     })
     SetToken(newToken) {
         localStorage.setItem("token", newToken)
@@ -16,6 +17,9 @@ class Helper {
     }
     GetToken() {
         return this.token
+    }
+    GetBaseUrl() {
+        return this.base
     }
 }
 
