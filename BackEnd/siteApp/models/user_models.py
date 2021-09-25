@@ -55,7 +55,7 @@ class User(AbstractUser):
     phone_private = models.BooleanField(null=True)
 
     #User profile picture
-    profile_picture = models.ImageField(upload_to="users/images/",null=True)
+    profile_picture = models.ImageField(upload_to=upload_profile_picture,null=True)
     #Collaborators are like "friends" in facebook
     #It's a many to many relationship
     collaborators = models.ManyToManyField("self",blank=True);

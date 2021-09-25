@@ -6,6 +6,8 @@ from django.contrib.auth import authenticate,login,logout
 from rest_framework.parsers import FormParser,MultiPartParser
 import siteApp.models as app_models
 from ..serializers import *
+import os
+from django.conf import settings
 
 
 def check_users_collaboration(user1,user2):
@@ -25,6 +27,11 @@ def convert_user_to_dictionary(user, see_private):
     final_dict['email'] = user.email
     final_dict['first_name'] = user.first_name
     final_dict['last_name'] = user.last_name
+    try:
+        final_dict['profile_picture'] = user.profile_picture.url
+    except:
+        final_dict['profile_picture'] = ''
+
 
     #Write the public parts that need permission
     if not user.phone_private:
@@ -55,7 +62,6 @@ class UserView(APIView):
         """This will return a list of users, or a specific user depending on parameters provided"""
 
         request_data = request.query_params
-
 
         #First check if you are checking for a specific user
         if "user_email" in request_data:
@@ -203,16 +209,36 @@ class UserView(APIView):
                 'changed':'true'
             }
         
-        if "user_image" in request_data:
+        if "user_profile_picture" in request_data:
 
             #Try to change the picture with the serializer
-            checkser =  UserPictureSerializer(data={"profile_picture":request_data["user_image"]})
+            checkser =  UserPictureSerializer(data={"profile_picture":request_data["user_profile_picture"]})
 
-            if not  checkser.is_valid():
-                return response_message(False,"The image you uploaded is corrupted or not an image")
+            print(request_data['user_profile_picture'])
+            #return Response('shhhh')
 
-            #If all is good replace the image
-            request.user.profile_picture = request_data['user_image']
+            if not checkser.is_valid():
+
+                response_dict['user_profile_picture'] = {
+                    'changed':'false',
+                    'error':"The image you uploaded is corrupted or not an image"
+                }
+            else:
+
+                #Delete the old image
+                try:
+                    old_filename = str(request.user.profile_picture.url).replace('/','\\')
+                    os.remove(str(settings.BASE_DIR)+"\\static"+old_filename)
+                except:
+                    pass
+
+                #If all is good replace the image
+                request.user.profile_picture = request_data['user_profile_picture']
+
+                response_dict['user_profile_picture'] = {
+                    'changed':'true',
+                    'url' : '/media/users/images/'+str(request_data['user_profile_picture'])
+                }
             
 
         #After all the changes try to save the user

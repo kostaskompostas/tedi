@@ -13,17 +13,17 @@ class Article(models.Model):
     author = models.ForeignKey(User,on_delete=models.CASCADE)
 
     #What is written in the article
-    content = models.TextField(max_length=500)
+    content = models.TextField(max_length=500,null=True)
 
     #Private articles can only be viewed by collaborators of the author
-    private = models.BooleanField()
+    private = models.BooleanField(null=True)
 
     #When was the article created
     created_on = models.DateField(auto_now_add=True)
 
     #Wether the article can be expanded with addons or not
     #When the article is finalized it will be visible to other users
-    finalized = models.BooleanField()
+    finalized = models.BooleanField(null=True)
 
 class ArticleAddon(models.Model):
     """This is a class that represents a file that is added to a specific
@@ -31,8 +31,6 @@ class ArticleAddon(models.Model):
 
     article = models.ForeignKey(Article,on_delete=models.CASCADE,null=True)
 
-    class Meta:
-        abstract = True
 
 class ArticleImage(ArticleAddon):
     """This is an image that is attatched to an article"""
