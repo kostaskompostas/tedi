@@ -14,7 +14,7 @@ def convert_offer_to_dictionary(offer,mode):
         'offer_id':offer.id,
         'offer_name':offer.name,
         'offer_description':offer.description,
-        'offer_user':offer.author,
+        'offer_user_email':offer.author.email,
         'offer_price':offer.price,
         'offer_paymethod':offer.pay_method.name,
         'offer_filled': 'true' if offer.filled != None else 'false'
@@ -91,7 +91,7 @@ class OfferView(APIView):
             return response_message(False,"The price must be a non-negative integer")
 
         #Check if the pay method is specified
-        paymethod = None
+        paymethod = app_models.get_default_pay_method()
         if "offer_paymethod" in request_data:
 
             #Try to find the payment method
@@ -109,11 +109,12 @@ class OfferView(APIView):
             new_offer.price = int(request_data['offer_price'])
             if paymethod != None:
                 new_offer.pay_method = paymethod
+            new_offer.filled = False
 
             new_offer.save()
             return response_message(True,"New offer was successfully saved")
-        except:
-            return response_message(False,"Error while saving the new offer to the database")
+        except Exception as e:
+            return response_message(False,"Error while saving the new offer to the database ("+str(type(e))+")")
 
     def get_offer_of_user(self,request):
         """This will return an offer if you are the logged in user and the request contained the offer_id, else it will return an appropriate fail response"""
@@ -193,8 +194,7 @@ class OfferView(APIView):
             return response_message(True,"Offer deleted successfully")
         except:
             return response_message(False,"Error while deleting offer from the database")
-        
-             
+                
 class OfferInterestView(APIView):
     """This endpoint will allow users to express interest in the various offers
     , see who is interested for one of their offers, and select an interested party to fill their offer or reject them"""
@@ -208,7 +208,7 @@ class OfferInterestView(APIView):
             return response_message(False,"Viewing offer interests requires being authenticated")
 
         #Then parse the parameters
-        request_data = request.data
+        request_data = request.query_params
 
         #Check if the required parameters are there
         if not check_dict_contains_one_key(request_data,['my_interest','offer_interest']):

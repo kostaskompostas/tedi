@@ -49,6 +49,7 @@ def check_dict_contains_keys(dict,list):
 
     for k in list:
         if k not in dict:
+            print(k)
             return False
     
     return True

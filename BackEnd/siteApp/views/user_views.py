@@ -34,13 +34,20 @@ def convert_user_to_dictionary(user, see_private):
     if see_private:
         final_dict['phone'] = user.phone
 
+
+        #Also return a list of collaborators
+        final_dict['collaborators'] = []
+        for c in user.collaborators.all():
+            final_dict['collaborators'].append(convert_user_to_dictionary(c,False))
+
+
     #Return the complete dictionary
     return final_dict
 
 class UserView(APIView):
 
     #  In theory these parsers are already been used by the django rest framework
-    parser_classes = [FormParser,MultiPartParser]
+    #parser_classes = [FormParser,MultiPartParser]
 
     """This endpoint is used for retrieving user infromation as well as creating new users"""
 
@@ -62,7 +69,7 @@ class UserView(APIView):
             #Check if you are collaborating with the user
             collab = False
             if request.user.is_authenticated:
-                collab = check_users_collaboration(request.user,user)
+                collab = check_users_collaboration(request.user,user) or request.user==user
             
             #Finally return the user as a response
             return Response(convert_user_to_dictionary(user,collab))
@@ -81,6 +88,7 @@ class UserView(APIView):
             return response_message(False,"You cannot create another user while you are logged in. (Except for admins)")
 
         request_data = request.data
+        print(request_data)
 
         #Check if all the required keys are there
         if not check_dict_contains_keys(request_data,["user_email","user_phone","user_first_name","user_last_name","user_password"]):
@@ -280,14 +288,14 @@ class AuthView(APIView):
             if not request.user.is_authenticated:
                 return response_message(False,"You are not currently logged in")
 
-            #If you are logged in, log yourself out
-            logout(request)
-
             #Delete the token if there is one
             try:
                 Token.objects.get(user=request.user).delete()
             except:
                 pass
+
+            #If you are logged in, log yourself out
+            logout(request)
 
             #Finaly send the success response
             return response_message(True,"You successfully logged out")
@@ -374,8 +382,6 @@ class CollabView(APIView):
 
             #Return the ok message
             return response_message(True,"The collaboration has successfully ended")
-
-
 
         if "create" in request_data:
             
