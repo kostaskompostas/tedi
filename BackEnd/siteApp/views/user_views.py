@@ -164,7 +164,7 @@ class UserView(APIView):
             else:
 
                 #Check that the old password is correct
-                if authenticate(request.user.email,request_data['user_old_password'])==None:
+                if authenticate(username=request.user.email,password=request_data['user_old_password'])==None:
                     response_dict['user_password'] ={
                     'changed':'false',
                     'error': 'The old password you provided is wrong'
