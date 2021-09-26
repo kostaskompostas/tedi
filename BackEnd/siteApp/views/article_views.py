@@ -3,9 +3,9 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from ..rest_utility import *
-import models as app_models
-from user_views import * 
-from serializers import ArticleImageSerializer
+import siteApp.models as app_models
+from .user_views import * 
+from siteApp.serializers import ArticleImageSerializer
 
 def convert_article_to_dictionary(article,addons):
     """This will convert an article model into a python dictionary

@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_utility import *
-import models as app_models
+from siteApp.rest_utility import *
+import siteApp.models as app_models
 
 
 def convert_message_to_dictionary(message):
