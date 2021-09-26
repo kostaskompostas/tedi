@@ -39,7 +39,8 @@ const Settings = (props) => {
                 "/api/user/",
                 {
                     user_email: e.target.email.value,
-                    user_password: e.target.password.value,
+                    user_old_password: e.target.password.value,
+                    user_password: e.target.newPassword.value,
                 },
                 {
                     headers: {
@@ -65,8 +66,10 @@ const Settings = (props) => {
         let newPassValue = form.newPassword.value.trim()
         let newPassConfValue = form.newPasswordConf.value.trim()
 
-        if (passValue)
-            console.log(emailValue + " " + passValue + " " + newPassValue)
+        if (newPassValue == newPassConfValue) formok = true
+        if (emailValue != "") formok = true
+        if (passValue != "") formok = true
+        console.log(emailValue + " " + passValue + " " + newPassValue)
         return formok
     }
 
