@@ -18,8 +18,8 @@ const SignUp = (props) => {
     const submitForm = (e) => {
         console.log("papopepo")
         e.preventDefault()
-        Helper.client
-            .post("/api/user", {
+        props.myHelper.client
+            .post("/api/user/", {
                 user_email: e.target.email.value,
                 user_first_name: e.target.first_name.value,
                 user_last_name: e.target.last_name.value,
@@ -29,8 +29,9 @@ const SignUp = (props) => {
             })
             .then(
                 (response) => {
-                    console.log(response.data)
-                    props.SignIn()
+                    if (response.data.success == "true") {
+                        props.SignIn(response.data.token)
+                    }
                 },
                 (error) => {
                     console.log(error)

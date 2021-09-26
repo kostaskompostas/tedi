@@ -31,9 +31,6 @@ const SignIn = (props) => {
                     console.log(response.data)
                     if (response.data.success == "true") {
                         props.SignIn(response.data.token)
-                        console.log(
-                            "sign in token " + props.myHelper.GetToken()
-                        )
                     }
                 },
                 (error) => {
@@ -81,9 +78,9 @@ const SignIn = (props) => {
                     </form>
                 </div>
                 <div className="mt-3">
-                    Already have an account?
+                    Dont have an account?
                     <Link to="/signup" className="btn btn-secondary btn-sm">
-                        Sign in
+                        Sign up
                     </Link>
                 </div>
             </div>

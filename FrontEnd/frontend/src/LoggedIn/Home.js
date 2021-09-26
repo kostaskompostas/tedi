@@ -45,6 +45,7 @@ const Home = (props) => {
             )
     }, [])
     const profile = () => {
+        let connectionCounter = 0
         const connStyle = {
             overflowY: "auto",
             border: "3px solid black",
@@ -77,9 +78,12 @@ const Home = (props) => {
                     </div>
                     <div className="d-flex flex-column mt-4">
                         <h2>Connections</h2>
-                        <div style={connStyle} className="">
+                        <ul style={connStyle} className="">
                             {getConnections().map((person) => (
-                                <div className="d-flex p-2">
+                                <li
+                                    key={"person" + connectionCounter++}
+                                    className="d-flex p-2"
+                                >
                                     <img
                                         src={profilePic}
                                         width="40px"
@@ -88,9 +92,9 @@ const Home = (props) => {
                                     <h4 className="ms-2">
                                         {person.name + " " + person.surname}
                                     </h4>
-                                </div>
+                                </li>
                             ))}
-                        </div>
+                        </ul>
                     </div>
                 </div>
             </div>

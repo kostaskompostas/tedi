@@ -103,7 +103,7 @@ const NavBar = (props) => {
                         </li>
                     </Link>
                 ))}
-                <li>
+                <li key="logout">
                     <button
                         onClick={props.SignOut}
                         value="log out"

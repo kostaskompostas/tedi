@@ -3,7 +3,8 @@ import axios from "axios"
 
 const Settings = (props) => {
     let client = props.myHelper.client
-    let formok = false
+    let formok = true
+    let emailHasChanged
 
     const [userInfo, setUserInfo] = useState("")
     useEffect(() => {
@@ -32,6 +33,7 @@ const Settings = (props) => {
     const SubmitForm = (e) => {
         e.preventDefault()
         formok = CheckForErrors(e)
+        console.log(formok)
         if (!formok) return
 
         client
@@ -39,8 +41,8 @@ const Settings = (props) => {
                 "/api/user/",
                 {
                     user_email: e.target.email.value,
-                    user_old_password: e.target.password.value,
                     user_password: e.target.newPassword.value,
+                    //user_old_password: e.target.password.value,
                 },
                 {
                     headers: {
@@ -66,9 +68,11 @@ const Settings = (props) => {
         let newPassValue = form.newPassword.value.trim()
         let newPassConfValue = form.newPasswordConf.value.trim()
 
-        if (newPassValue == newPassConfValue) formok = true
-        if (emailValue != "") formok = true
-        if (passValue != "") formok = true
+        //if (emailValue != userInfo.email) emailHasChanged = true
+
+        if (newPassValue != newPassConfValue) formok = false
+        //if (emailValue == "") formok = false
+        //if (passValue == "") formok = false
         console.log(emailValue + " " + passValue + " " + newPassValue)
         return formok
     }
