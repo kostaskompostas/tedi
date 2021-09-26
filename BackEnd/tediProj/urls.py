@@ -28,9 +28,11 @@ urlpatterns = [
     path('api/skills/',views.SkillView.as_view(),name="skills"),
     path('api/edu/',views.EducationView.as_view(), name = "education"),
     path('api/offers/',views.OfferView.as_view(),name = 'offers'),
-    path('api/message/',views.ArticleView.as_view(), name = "articles"),
+    path('api/message/',views.MessengerView.as_view(), name = "messenger"),
     path('api/collab/',views.CollabView.as_view(),name = "collaboaration"),
-    path('api/offers/interest/',views.OfferInterestView.as_view(),name = "offerintrerest")
+    path('api/offers/interest/',views.OfferInterestView.as_view(),name = "offerintrerest"),
+    path('api/articles/',views.ArticleView.as_view(),name="articles"),
+    path('api/articles/interact/',views.ArticleInteractionView.as_view(),name = "interarticle")
 ]
 
 

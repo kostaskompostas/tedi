@@ -37,4 +37,27 @@ class ArticleImage(ArticleAddon):
 
     data = models.ImageField(upload_to="users/articles/images/")
 
+class Comment(models.Model):
+    """This is for users to leave comments on the articles"""
+
+    #The article that the comment is about
+    article = models.ForeignKey(Article,on_delete=models.CASCADE)
+
+    #The user leaving the comment
+    user = models.ForeignKey(User,on_delete=models.CASCADE)
+
+    #The content of the comment
+    content = models.TextField(max_length=300,null=False)
+
+
+class Like(models.Model):
+    """This is for users to leave a like on the article"""
+
+    #The article that the comment is about
+    article = models.ForeignKey(Article,on_delete=models.CASCADE)
+
+    #The user leaving the comment
+    user = models.ForeignKey(User,on_delete=models.CASCADE)
+
+
 #FOR VIDEOS WE DON'T KNOW YET

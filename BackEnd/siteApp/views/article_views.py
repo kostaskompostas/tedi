@@ -32,6 +32,14 @@ def convert_article_to_dictionary(article,addons):
     final_dict['images'] = img_list
     return final_dict
 
+def convert_comment_to_dictionary(comment):
+
+    return{
+        'comment_id':comment.id,
+        'user_email':comment.user.email,
+        'content':comment.content
+    }
+
 class ArticleView(APIView):
     """This endpoint allows users to retrieve articles by other users
     and also to post their own articles"""
@@ -227,4 +235,102 @@ class ArticleView(APIView):
         except:
             return response_message(False,"Error while deleting article")
 
+class ArticleInteractionView(APIView):
+    """This is for users to leave comments or likes on specific articles"""
+
+    def get(self,request,format=None):
+        """This is for gettings the comments and the likes on a specific article"""
+
+        #Parse the data
+        request_data = request.query_params
+
+        #Check that there is an article id there
+        if not 'article_id' in request_data:
+            return response_message(False,"Parameter article_id was not specified")
+
+        #Try to fetch the specific article
+        article = None
+        try:
+            article = app_models.Article.objects.get(pk=int(request_data['article_id']))
+        except:
+            return response_message(False,"The article_id does not correspond to an article")
         
+        #Then fetch the like number
+        num_likes = app_models.Like.objects.filter(article=article).count()
+
+        #Get the list of comments for this article
+        comment_qset = app_models.Comment.objects.filter(article=article)
+
+        #Construct the response based on that
+        return Response({
+            'success':'true',
+            'likes':num_likes,
+            'comments': list_from_queryset(comment_qset,convert_comment_to_dictionary)
+        })
+
+    def post(self,request,format=None):
+        """This will allow logged in users to leave comments and likes on the articles"""
+
+        #Check that you are logged in
+        if not request.user.is_authenticated:
+            return response_message(False,"You must be logged in to interact with the article")
+
+        #Parse the parameters
+        request_data = request.data
+
+        #Check that the essential parameters are there
+        if not check_dict_contains_one_key(request_data,["like","comment"]) or not 'article_id' in request_data:
+            return response_message(False,"One of the required parameters is missing")
+
+        #Try and fetch the article in question
+        article = None
+        try:
+            article = app_models.Article.objects.get(pk=int(request_data['article_id']))
+        except:
+            return response_message(False,"The article_id does not correspond to an article")
+
+        #Then differentiate based on mode
+        if "comment" in request_data:
+
+            #Check that the contents of the comment are in the request
+            if not "comment_content" in request_data:
+                return response_message(False,"One of the required parameters is missing")
+
+            #Then construct the comment and save it
+            try:
+                comment = app_models.Comment()
+                comment.user = request.user
+                comment.content = request_data['comment_content']
+                comment.article = article
+                comment.save()
+
+                return response_message(True,"The comment for the article was successfully saved")
+            except:
+                return response_message(False,"Error saving new comment to database")
+
+        if "like" in request_data:
+
+            #Check if you have a previous like
+            like = app_models.Like.objects.filter(user=request.user,article=article)[0]
+
+            if like != None:
+                
+                #Delete the previous like you had
+                try:
+                    like.delete()
+
+                    return response_message(True,"You unliked the article successfully")
+                except:
+                    return response_message(False,"Error deleting like from database")
+            else:
+
+                #In that case, create and add a like from this user to the article
+                try:
+                    like = app_models.Like()
+                    like.user = request.user
+                    like.article = article
+                    like.save()
+
+                    return response_message(True,"You liked the article successfully")
+                except:
+                    return response_message(False,"Error adding like to database")
