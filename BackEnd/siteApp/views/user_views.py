@@ -153,6 +153,30 @@ class UserView(APIView):
         #Because these will happen individually, you will have a dictionary of messages for each thing you are trying to alter
         response_dict = {}
 
+        if "user_password" in request_data:
+
+            #Check that you have the old password and it matches
+            if not "user_old_password" in request_data:
+                response_dict['user_password'] ={
+                'changed':'false',
+                'error': 'You must provide a user_old_password in order to change'
+                }
+            else:
+
+                #Check that the old password is correct
+                if authenticate(request.user.email,request_data['user_old_password'])==None:
+                    response_dict['user_password'] ={
+                    'changed':'false',
+                    'error': 'The old password you provided is wrong'
+                    }
+                else:
+
+                    #Change the user password
+                    request.user.set_password(request_data['user_password'])
+                    response_dict['user_password'] ={
+                        'changed':'true'
+                    }
+
 
         #Try to change your email
         if "user_email" in request_data:
@@ -169,13 +193,7 @@ class UserView(APIView):
                     'changed':'true'
                 }
         
-        if "user_password" in request_data:
-
-            #Change the user password
-            request.user.set_password(request_data['user_password'])
-            response_dict['user_password'] ={
-                'changed':'true'
-            }
+        
         
         if "user_first_name" in request_data:
 
