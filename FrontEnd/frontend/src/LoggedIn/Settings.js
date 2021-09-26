@@ -3,6 +3,8 @@ import axios from "axios"
 
 const Settings = (props) => {
     let client = props.myHelper.client
+    let formok = false
+
     const [userInfo, setUserInfo] = useState("")
     useEffect(() => {
         var token = props.myHelper.GetToken()
@@ -29,6 +31,9 @@ const Settings = (props) => {
     }
     const SubmitForm = (e) => {
         e.preventDefault()
+        formok = CheckForErrors(e)
+        if (!formok) return
+
         client
             .put(
                 "/api/user/",
@@ -53,6 +58,18 @@ const Settings = (props) => {
                 }
             )
     }
+    const CheckForErrors = (e) => {
+        let form = e.target
+        let emailValue = form.email.value.trim()
+        let passValue = form.password.value.trim()
+        let newPassValue = form.newPassword.value.trim()
+        let newPassConfValue = form.newPasswordConf.value.trim()
+
+        if (passValue)
+            console.log(emailValue + " " + passValue + " " + newPassValue)
+        return formok
+    }
+
     return (
         <div className="d-flex flex-column align-items-center">
             <h3>Your account settings</h3>
@@ -74,7 +91,6 @@ const Settings = (props) => {
                             className="form-input"
                             type="password"
                             name="password"
-                            placeholder=""
                         />
                     </div>
                     <div className="d-flex flex-column">
@@ -83,7 +99,7 @@ const Settings = (props) => {
                         <input
                             className="form-input"
                             type="password"
-                            name="passwordconf"
+                            name="newPassword"
                             placeholder="Enter your new password"
                         />
                     </div>
@@ -95,7 +111,7 @@ const Settings = (props) => {
                         <input
                             className="form-input"
                             type="password"
-                            name="passwordconf"
+                            name="newPasswordConf"
                             placeholder="Re-Enter your new password"
                         />
                     </div>

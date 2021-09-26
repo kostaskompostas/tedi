@@ -8,6 +8,7 @@ const FormInput = (label, type, name, placeholder, extraclasses = "") => {
                 className="form-input"
                 type={type}
                 name={name}
+                defaultValue={placeholder}
                 placeholder={placeholder}
             />
         </div>

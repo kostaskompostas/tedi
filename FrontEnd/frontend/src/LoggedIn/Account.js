@@ -12,6 +12,7 @@ const Account = (props) => {
         position: "relative",
     }
     const displayList = (type, array, title) => {
+        let counter = 0
         return (
             <div className="d-flex flex-column align-items-start ms-3">
                 <h4>{title}</h4>
@@ -20,13 +21,13 @@ const Account = (props) => {
                         <input
                             className="m-3 p-3"
                             type="text"
-                            value="add new"
+                            defaultValue="add new"
                         ></input>
                         <span className="btn btn-primary">+</span>
                     </div>
                     <ul style={listStyle} className="">
                         {array.map((entry) => (
-                            <li>{entry}</li>
+                            <li key={type + counter++}>{entry}</li>
                         ))}
                     </ul>
                 </div>
