@@ -12,7 +12,7 @@ class App extends Component {
     state = { logged: false, token: true, helper: new Helper() }
 
     SignIn = (newToken) => {
-        this.setState({ logged: true })
+        this.setState({ ...this.state, logged: true })
         console.log(this.logged)
         this.state.helper.SetToken(newToken)
         ;<Redirect push to="/home" />
@@ -35,8 +35,7 @@ class App extends Component {
             .then(
                 (response) => {
                     console.log(response.data.message)
-                    this.setState({ token: "" })
-                    this.setState({ logged: false })
+                    this.setState({ ...this.state, token: "", logged: false })
                 },
                 (error) => {
                     console.log(error)

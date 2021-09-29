@@ -57,17 +57,21 @@ const NavBar = (props) => {
 
     return (
         <nav>
-            <ul className="nav-links">
-                <Link style={navStyle} to={"/home"}>
+            <ul className="nav-links" key="bazinga">
+                <Link key={"logoicon"} style={navStyle} to={"/home"}>
                     <li className="Logo " key="logo">
                         <h3>jobo</h3>
                     </li>
                 </Link>
 
                 <li key="pages">
-                    <ul className="d-flex ms-5 me-5">
+                    <ul key="generalpages" className="d-flex ms-5 me-5">
                         {pages.map((page) => (
-                            <Link style={navStyle} to={page.url}>
+                            <Link
+                                key={page.name}
+                                style={navStyle}
+                                to={page.url}
+                            >
                                 <li
                                     className="d-flex align-items-center badge rounded-pill bg-primary"
                                     id={page.name}
@@ -87,7 +91,7 @@ const NavBar = (props) => {
                 </li>
 
                 {personalPages.map((page) => (
-                    <Link style={navStyle} to={page.url}>
+                    <Link key={page.name} style={navStyle} to={page.url}>
                         <li
                             className="d-flex align-items-center badge rounded-pill bg-primary"
                             id={page.name}

@@ -25,6 +25,12 @@ class Article(models.Model):
     #When the article is finalized it will be visible to other users
     finalized = models.BooleanField(null=True)
 
+    #Number of likes and number of comments for this article
+    #Independently saved to avoid taxing the database
+    num_likes = models.PositiveIntegerField(null=False,default=0)
+    num_comments = models.PositiveIntegerField(null=False,default=0)
+
+
 class ArticleAddon(models.Model):
     """This is a class that represents a file that is added to a specific
     article. This can be an image or a video, that's why there are subclasses to this one"""

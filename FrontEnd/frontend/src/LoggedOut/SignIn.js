@@ -30,6 +30,7 @@ const SignIn = (props) => {
                 (response) => {
                     console.log(response.data)
                     if (response.data.success == "true") {
+                        console.log(response.data)
                         props.SignIn(response.data.token)
                     }
                 },

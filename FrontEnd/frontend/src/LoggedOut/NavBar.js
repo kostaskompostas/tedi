@@ -9,7 +9,7 @@ const navStyle = {
 const NavBar = () => {
     return (
         <nav className="m-3">
-            <ul className="nav-links">
+            <ul key="navbarloggedin" className="nav-links">
                 <Link style={navStyle} to={"/home"}>
                     <li className="Logo " key="logo">
                         <h3>jobo</h3>

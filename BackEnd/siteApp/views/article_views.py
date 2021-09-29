@@ -19,6 +19,8 @@ def convert_article_to_dictionary(article,addons):
         'user_last_name':article.author.last_name,
         'article_content':article.content,
         'created_on': str(article.created_on),
+        'num_likes':article.num_likes,
+        'num_comments':article.num_comments
     }
 
     #Get the list of article image urls that belong to this article
@@ -37,6 +39,8 @@ def convert_comment_to_dictionary(comment):
     return{
         'comment_id':comment.id,
         'user_email':comment.user.email,
+        'user_alias':comment.user.first_name+" "+comment.user.last_name,
+        'user_picture':comment.user.profile_picture.url,
         'content':comment.content
     }
 
@@ -159,10 +163,17 @@ class ArticleView(APIView):
             #Fetch the article that you are adding an image to
             article = None
             try:
-                article = app_models.Article.objects.get(author=request.user,pk=int(request_data['article_id']),finalized=False)
-            except:
-                return response_message(False,"The article_id does not correspond to an article you have posted that is not finalized")
+                article = app_models.Article.objects.get(pk=int(request_data['article_id']))
+            except Exception as e:
+                return response_message(False,"The article_id does not correspond to an article")
             
+            #Check if you are the owner of the article
+            if request.user.id != article.author.id:
+                return response_message(False,"You are not the owner of the article")
+            
+            #Check if the article is already finalized
+            if article.finalized:
+                return response_message(False,"You cannot post pictures on a finalized article")
 
             #Then check if the image_file can be validated with the serializer
             checkser = ArticleImageSerializer(data={"data":request_data['image_file']})
@@ -296,14 +307,21 @@ class ArticleInteractionView(APIView):
             if not "comment_content" in request_data:
                 return response_message(False,"One of the required parameters is missing")
 
-            #Then construct the comment and save it
+            
             try:
+
+                #Change the number of comments on the article and save it
+                article.num_comments += 1
+                article.save()
+
+                #Then construct the comment and save it
                 comment = app_models.Comment()
                 comment.user = request.user
                 comment.content = request_data['comment_content']
                 comment.article = article
                 comment.save()
 
+                
                 return response_message(True,"The comment for the article was successfully saved")
             except:
                 return response_message(False,"Error saving new comment to database")
@@ -311,25 +329,42 @@ class ArticleInteractionView(APIView):
         if "like" in request_data:
 
             #Check if you have a previous like
-            like = app_models.Like.objects.filter(user=request.user,article=article)[0]
+            like = None
+            try:
+                like = app_models.Like.objects.get(user=request.user,article=article)
+            except:
+                pass
+
+            if "checkonly" in request_data:
+                return response_message(like != None,"Check success param to see if you have liked this article") 
 
             if like != None:
                 
-                #Delete the previous like you had
                 try:
+
+                    #Delete the previous like you had
                     like.delete()
+
+                    #Change the number of likes on the article and save it
+                    article.num_likes -= 1
+                    article.save()
 
                     return response_message(True,"You unliked the article successfully")
                 except:
                     return response_message(False,"Error deleting like from database")
             else:
 
-                #In that case, create and add a like from this user to the article
                 try:
+
+                    #In that case, create and add a like from this user to the article
                     like = app_models.Like()
                     like.user = request.user
                     like.article = article
                     like.save()
+
+                    #Change the number of likes on the article and save it
+                    article.num_likes += 1
+                    article.save()
 
                     return response_message(True,"You liked the article successfully")
                 except:

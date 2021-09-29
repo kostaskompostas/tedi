@@ -1,12 +1,12 @@
 import NavBar from "./NavBar"
 
-import Home from "./Home"
+import Home from "./Home/Home"
 import Network from "./Network"
 import Jobs from "./Jobs"
 import Conversations from "./Conversations"
 
 import Notifications from "./Notifications"
-import Account from "./Account"
+import Account from "./Account/Account"
 import Settings from "./Settings"
 
 import React, { Component, useState, Children } from "react"
@@ -23,21 +23,6 @@ import {
 } from "react-router-dom"
 
 const LoggedInRouter = (props) => {
-    const [projectId, setProjectId] = useState(0)
-    const [sprintId, setSprintId] = useState(0)
-
-    //get default: gets first available project and first available sprint
-    //so it can display something by default
-
-    // path : project/0/settings
-    //path : project/0/sprint/5/retro
-    // path : project/newproject
-    /*
-/project/newproject
-`/project/:projectid/settings`
-/project/:projectid/sprint/:sprintid
-/project/:projectid/sprint/retro
-*/
     console.log(props.myHelper.GetToken())
 
     let url = window.location.href
@@ -52,9 +37,7 @@ const LoggedInRouter = (props) => {
                     </Route>
                     <Route
                         path={`/home`}
-                        render={() => (
-                            <Home peos={"big"} myHelper={props.myHelper} />
-                        )}
+                        render={() => <Home myHelper={props.myHelper} />}
                     />
                     <Route
                         path={`/network`}

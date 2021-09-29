@@ -4,7 +4,8 @@ import axios from "axios"
 const Settings = (props) => {
     let client = props.myHelper.client
     let formok = true
-    let emailHasChanged
+    let emailHasChanged = false
+    let passwordHasChanged = false
 
     const [userInfo, setUserInfo] = useState("")
     useEffect(() => {
@@ -30,30 +31,35 @@ const Settings = (props) => {
         name: userInfo.first_name,
         surname: userInfo.last_name,
     }
+
     const SubmitForm = (e) => {
         e.preventDefault()
         formok = CheckForErrors(e)
         console.log(formok)
         if (!formok) return
 
+        let formData = { user_old_password: e.target.password.value }
+
+        //add data to form if it has changed
+        if (emailHasChanged)
+            formData = { ...formData, user_email: e.target.email.value }
+        if (passwordHasChanged)
+            formData = {
+                ...formData,
+                user_password: e.target.newPassword.value,
+            }
+        console.log(formData)
         client
-            .put(
-                "/api/user/",
-                {
-                    user_email: e.target.email.value,
-                    user_password: e.target.newPassword.value,
-                    //user_old_password: e.target.password.value,
+            .put("/api/user/", formData, {
+                headers: {
+                    Authorization: "Token " + props.myHelper.GetToken(),
                 },
-                {
-                    headers: {
-                        Authorization: "Token " + props.myHelper.GetToken(),
-                    },
-                }
-            )
+            })
             .then(
                 (response) => {
                     console.log(response.data)
-                    if (response.data.success == "true") {
+                    if (response.data.changed == "true") {
+                        console.log("changed!")
                     }
                 },
                 (error) => {
@@ -68,12 +74,20 @@ const Settings = (props) => {
         let newPassValue = form.newPassword.value.trim()
         let newPassConfValue = form.newPasswordConf.value.trim()
 
-        //if (emailValue != userInfo.email) emailHasChanged = true
+        if (emailValue != userInfo.email) emailHasChanged = true
 
-        if (newPassValue != newPassConfValue) formok = false
-        //if (emailValue == "") formok = false
-        //if (passValue == "") formok = false
-        console.log(emailValue + " " + passValue + " " + newPassValue)
+        if (newPassValue != "") {
+            passwordHasChanged = true
+            formok = newPassValue != newPassConfValue ? false : true
+        } else {
+            passwordHasChanged = false
+        }
+
+        if (!passwordHasChanged && !emailHasChanged) {
+            console.log("heheh")
+            return false
+        }
+
         return formok
     }
 
@@ -89,6 +103,7 @@ const Settings = (props) => {
                             type="text"
                             name="email"
                             placeholder={profile.email}
+                            defaultValue={profile.email}
                         />
                     </div>
                     <div className="d-flex flex-column mt-3">
