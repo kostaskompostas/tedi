@@ -13,11 +13,29 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from siteApp.views.offer_views import OfferInterestView, OfferView
+from siteApp.views.user_views import SkillView
 from django.contrib import admin
 from django.urls import path
 from siteApp import views
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/user/',views.UserView.as_view(),name = 'signup'),
+    path('api/auth/',views.AuthView.as_view(),name = 'signup'),
+    path('api/user/',views.UserView.as_view(),name = 'user'),
+    path('api/skills/',views.SkillView.as_view(),name="skills"),
+    path('api/edu/',views.EducationView.as_view(), name = "education"),
+    path('api/offers/',views.OfferView.as_view(),name = 'offers'),
+    path('api/message/',views.MessengerView.as_view(), name = "messenger"),
+    path('api/collab/',views.CollabView.as_view(),name = "collaboaration"),
+    path('api/offers/interest/',views.OfferInterestView.as_view(),name = "offerintrerest"),
+    path('api/articles/',views.ArticleView.as_view(),name="articles"),
+    path('api/articles/interact/',views.ArticleInteractionView.as_view(),name = "interarticle")
 ]
+
+
+urlpatterns.extend(
+    static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
+)

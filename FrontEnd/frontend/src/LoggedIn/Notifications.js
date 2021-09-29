@@ -53,13 +53,22 @@ const Notifications = (props) => {
             subject: "post4",
         },
     ]
+    let connCounter = 0
+    let notifCounter = 0
     return (
         <div className="d-flex flex-column align-items-center">
             <div className="d-flex flex-column align-items start">
                 <h3>Connection Requests</h3>
-                <ul style={scrollstyle} className="border border-primary">
+                <ul
+                    key="connections"
+                    style={scrollstyle}
+                    className="border border-primary"
+                >
                     {requests.map((request) => (
-                        <li className="d-flex justify-content-between align-items-center m-1">
+                        <li
+                            className="d-flex justify-content-between align-items-center m-1"
+                            key={"conn" + connCounter++}
+                        >
                             <img src={profilepic} height="30px" width="30px" />
                             {request.name + " " + request.surname}
                             <div className="ms-5 ">
@@ -84,7 +93,10 @@ const Notifications = (props) => {
                     className="border border-primary d-flex flex-column"
                 >
                     {interests.map((event) => (
-                        <div className="d-flex justify-content-between align-items-center m-1">
+                        <div
+                            key={"notif" + notifCounter++}
+                            className="d-flex justify-content-between align-items-center m-1"
+                        >
                             <img src={profilepic} height="30px" width="30px" />
                             <div className=" text-left">
                                 {event.name + " " + event.surname}
