@@ -1,5 +1,6 @@
 import { Avatar } from "../../util/util.js"
 import profilePic from "../../icons/profile.png"
+import { propTypes } from "react-bootstrap/esm/Image"
 
 export default function Profile(props) {
     let connectionCounter = 0
@@ -14,22 +15,31 @@ export default function Profile(props) {
     //connections should also be buttons that take you to their profile page
     const getConnections = () => {
         let connections = [
-            { first_name: "Johnathan", last_name: "Joestar" },
-            { first_name: "Jotaro", last_name: "kujo" },
-            { first_name: "Dio", last_name: "Brando" },
-            { first_name: "Arthur", last_name: "Morgan" },
-            { first_name: "Johnathan", last_name: "Joestar" },
-            { first_name: "Jotaro", last_name: "kujo" },
-            { first_name: "Dio", last_name: "Brando" },
-            { first_name: "Arthur", last_name: "Morgan" },
-            { first_name: "Johnathan", last_name: "Joestar" },
-            { first_name: "Jotaro", last_name: "kujo" },
-            { first_name: "Dio", last_name: "Brando" },
-            { first_name: "Arthur", last_name: "Morgan" },
-            { first_name: "Johnathan", last_name: "Joestar" },
-            { first_name: "Jotaro", last_name: "kujo" },
-            { first_name: "Dio", last_name: "Brando" },
-            { first_name: "Arthur", last_name: "Morgan" },
+            {
+                first_name: "Johnathan",
+                last_name: "Joestar",
+                email: "bazinga@lol.com",
+            },
+            {
+                first_name: "Jotaro",
+                last_name: "kujo",
+                email: "bazinga@lol.com",
+            },
+            {
+                first_name: "Dio",
+                last_name: "Brando",
+                email: "bazinga@lol.com",
+            },
+            {
+                first_name: "Arthur",
+                last_name: "Morgan",
+                email: "bazinga@lol.com",
+            },
+            {
+                first_name: "Johnathan",
+                last_name: "Joestar",
+                email: "bazinga@lol.com",
+            },
         ]
         return connections
     }
@@ -37,26 +47,16 @@ export default function Profile(props) {
         <div className="d-flex flex-column align-items-start">
             <div className="d-flex flex-column bg-info p-3 border border-dark rounded">
                 <div className=" border-dark border-bottom">
-                    <div className="d-flex p-2">
-                        <Avatar
-                            avatarUrl={
-                                props.myHelper.GetBaseUrl() +
-                                props.userInfo.profile_picture
-                            }
-                            userName={props.userInfo.first_name}
-                            width="80px"
-                            height="80px"
-                        />
-                        <div className="ps-3">
-                            <h4>Welcome,</h4>
-                            <h3>
-                                {props.userInfo == ""
-                                    ? "loading"
-                                    : props.userInfo.first_name +
-                                      " " +
-                                      props.userInfo.last_name}
-                            </h3>
-                        </div>
+                    <div className="d-flex flex-column p-2">
+                        <h2>Welcome,</h2>
+                        {props.userInfo !== "" ? (
+                            <Avatar
+                                user_email={props.userInfo.email}
+                                myHelper={props.myHelper}
+                                width="80px"
+                                height="80px"
+                            />
+                        ) : null}
                     </div>
                     <div>
                         <h5>Current position</h5>
@@ -72,6 +72,8 @@ export default function Profile(props) {
                                 className="d-flex p-2"
                             >
                                 <Avatar
+                                    user_email={person.email}
+                                    myHelper={props.myHelper}
                                     avatarUrl={profilePic}
                                     width="40px"
                                     height="40px"

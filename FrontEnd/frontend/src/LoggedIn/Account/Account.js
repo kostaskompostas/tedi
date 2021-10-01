@@ -5,8 +5,8 @@ import autocomplete from "../../util/AutoComplete.js"
 import { Avatar, FormInput } from "../../util/util.js"
 
 const Account = (props) => {
+    console.log(props)
     let client = props.myHelper.client
-    let profile = { name: "Samuel", surname: "Hayden" }
     const listStyle = {
         overflowY: "auto",
         width: "300px",
@@ -41,12 +41,7 @@ const Account = (props) => {
         return skills
     }
 
-    const [userInfo, setUserInfo] = useState({
-        email: "",
-        first_name: "",
-        last_name: "",
-        profile_picture: "",
-    })
+    const [userInfo, setUserInfo] = useState()
     useEffect(() => {
         var token = props.myHelper.GetToken()
         console.log(token)
@@ -85,8 +80,6 @@ const Account = (props) => {
     const [userPicture, SetUserPicture] = useState()
     const OnPictureChange = (e) => {
         e.preventDefault()
-        console.log(e.target.files[0])
-        console.log(e.target.value)
 
         const formData = new FormData()
         formData.append(
@@ -95,7 +88,6 @@ const Account = (props) => {
             e.target.files[0].name
         )
 
-        console.log(formData)
         client
             .put("api/user/", formData, {
                 headers: {
@@ -120,7 +112,6 @@ const Account = (props) => {
                                 console.log(error)
                             }
                         )
-                    console.log(userInfo)
                 },
                 (error) => {
                     console.log(error)
@@ -195,13 +186,10 @@ const Account = (props) => {
         e.preventDefault()
         switch (e.target.name) {
             case "work":
-                console.log("work")
                 break
             case "edu":
-                console.log("edu")
                 break
             case "skills":
-                console.log("skills")
                 let skills
 
                 break
@@ -241,7 +229,7 @@ const Account = (props) => {
             </div>
         )
     }
-    return (
+    return userInfo != undefined ? (
         <div className="d-flex flex-column align-items-center">
             <div className="d-flex flex-column align-items-start">
                 <h3>Your Personal Info</h3>
@@ -250,11 +238,9 @@ const Account = (props) => {
                         <div className="d-flex p-2 align-items-end">
                             <div className="d-flex flex-column">
                                 <Avatar
-                                    avatarUrl={
-                                        props.myHelper.GetBaseUrl() +
-                                        userInfo.profile_picture
-                                    }
-                                    userName={userInfo.name}
+                                    user_email={userInfo.email}
+                                    myHelper={props.myHelper}
+                                    avatarUrl={userInfo.profile_picture}
                                     width="200px"
                                     height="200px"
                                 />
@@ -302,6 +288,6 @@ const Account = (props) => {
                 </div>
             </div>
         </div>
-    )
+    ) : null
 }
 export default Account

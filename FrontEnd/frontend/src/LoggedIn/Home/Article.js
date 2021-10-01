@@ -10,7 +10,6 @@ function Article(props) {
     //refreshes comments
     useEffect(() => {
         if (comments.show) RefreshComments()
-        console.log("comments show " + comments.show)
     }, [comments.show])
 
     const [likes, SetLikes] = useState(props.data.num_likes)
@@ -47,10 +46,6 @@ function Article(props) {
                     }
 
                     SetHasLiked(value)
-                    //console.log(likes.hasLiked)
-                    //console.log(likes)
-                    //console.log(response.data.comments.length)
-                    //console.log("fetchnumbers")
                 },
                 (error) => console.log(error.data)
             )
@@ -73,7 +68,6 @@ function Article(props) {
         )
 
         let newcomments = response.data.comments
-        console.log(newcomments)
         SetComments({
             ...comments,
             data: newcomments,
@@ -105,8 +99,6 @@ function Article(props) {
                         ...comments,
                         num_comments: response.data.comments.length,
                     })
-                    //console.log(response.data.comments.length)
-                    //console.log("fetchnumbers")
                 },
                 (error) => console.log(error.data)
             )
@@ -132,7 +124,6 @@ function Article(props) {
             )
             .then(
                 (response) => {
-                    console.log(response.data)
                     console.log("comment submitted")
                     e.target.myComment.value = ""
                     RefreshComments()
@@ -161,7 +152,6 @@ function Article(props) {
                 (response) => {
                     SetHasLiked((prevlikes) => !prevlikes)
                     FetchLikesAndCommentsNum()
-                    console.log(likes)
                 },
                 (error) => console.log(error.data)
             )
@@ -194,23 +184,17 @@ function Article(props) {
         >
             <div className="border-bottom border-dark ml-5 mr-5  d-flex flex-column align-items-start ">
                 <div className="d-flex p-2 justify-content- ">
-                    <div className="d-flex ">
+                    <div className="d-flex flex-column ">
                         <Avatar
-                            avatarUrl={profilePic}
+                            myHelper={props.myHelper}
+                            user_email={article.user_email}
                             userName={article.user_first_name}
                             width="30px"
                             height="30px"
                         />
-                        <div>
-                            <h4 className="ms-2">
-                                {article.user_first_name +
-                                    " " +
-                                    article.user_last_name}
-                            </h4>
-                            <span className="ms-2">
-                                posted on {article.created_on}
-                            </span>
-                        </div>
+                        <span className="ms-2">
+                            posted on {article.created_on}
+                        </span>
                     </div>
                     {article.user_email === props.userInfo.email ? (
                         <button
@@ -273,14 +257,14 @@ function Article(props) {
 
 function Comment(props) {
     let comment = props.data
-    console.log(comment.user_picture)
+    //console.log(comment)
     return (
         <div className="p-2 mt-2 border border-secondary ">
             <Avatar
-                avatarUrl={props.myHelper.GetBaseUrl() + comment.user_picture}
+                user_email={comment.user_email}
+                myHelper={props.myHelper}
                 width="20px"
                 height="20px"
-                userName={comment.user_alias}
             />
 
             <span>{comment.content}</span>

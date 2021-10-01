@@ -30,7 +30,26 @@ const SignUp = (props) => {
             .then(
                 (response) => {
                     if (response.data.success == "true") {
-                        props.SignIn(response.data.token)
+                        console.log(response.data)
+                        props.myHelper.client
+                            .post("/api/auth/", {
+                                login: true,
+                                user_email: e.target.email.value,
+                                user_password: e.target.password.value,
+                                format: "json",
+                            })
+                            .then(
+                                (response) => {
+                                    console.log(response.data)
+                                    if (response.data.success == "true") {
+                                        console.log(response.data)
+                                        props.SignIn(response.data.token)
+                                    }
+                                },
+                                (error) => {
+                                    console.log(error)
+                                }
+                            )
                     }
                 },
                 (error) => {

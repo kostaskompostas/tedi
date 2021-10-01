@@ -13,9 +13,11 @@ class App extends Component {
 
     SignIn = (newToken) => {
         this.setState({ ...this.state, logged: true })
-        console.log(this.logged)
-        this.state.helper.SetToken(newToken)
-        ;<Redirect push to="/home" />
+        //this.state.helper.SetToken(newToken)
+        const foo = (prevstate, newToken) => prevstate.helper.SetToken(newToken)
+        foo(this.state, newToken)
+        return
+        ;<Redirect to="/home" />
     }
 
     SignOut = () => {
