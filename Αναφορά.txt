@@ -49,8 +49,13 @@ Network
 Conversations
 Notifications
 Settings
+
 Μερικώς:
 Account (χωρις τα skills)
+
+Δεν υλοποιηθηκαν:
+job offers
+admin page
 
 
 
