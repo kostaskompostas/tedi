@@ -9,6 +9,8 @@ import Notifications from "./Notifications"
 import Account from "./Account/Account"
 import Settings from "./Settings"
 
+import Admin from "./Admin"
+
 import React, { Component, useState, Children } from "react"
 
 import "../App.css"
@@ -115,16 +117,18 @@ const LoggedInRouter = (props) => {
                             />
                         )}
                     />
-                    <Route
-                        path={`/viewaccount`}
-                        render={() => (
-                            <Account
-                                viewUser={props.userInfo.email}
-                                userInfo={props.userInfo}
-                                myHelper={props.myHelper}
-                            />
-                        )}
-                    />
+                    {
+                        <Route
+                            path={"/admin"}
+                            render={() => (
+                                <Admin
+                                    userInfo={props.userInfo}
+                                    myHelper={props.myHelper}
+                                    FetchUserData={props.FetchUserData}
+                                />
+                            )}
+                        />
+                    }
                 </Switch>
             </div>
         </Router>

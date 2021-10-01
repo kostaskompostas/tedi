@@ -3,7 +3,7 @@ import { Redirect } from "react-router-dom"
 
 import "./App.css"
 import axios from "axios"
-
+import Admin from "./LoggedIn/Admin"
 import LoggedOutRouter from "./LoggedOut/LoggedOutRouter"
 import LoggedInRouter from "./LoggedIn/LoggedInRouter"
 import Helper from "./util/Helper"
@@ -12,6 +12,8 @@ const App = (props) => {
     const [helper, SetHelper] = useState(new Helper())
     const [logged, SetLogged] = useState(false)
     const [userInfo, SetUserInfo] = useState()
+    const [admin, SetAdmin] = useState(false)
+    let is_admin = false
 
     const FetchUserData = () => {
         helper.client
@@ -38,7 +40,12 @@ const App = (props) => {
                 console.log("APP LOGIN RESPONSE")
                 console.log(response.data.email)
                 SetUserInfo(response.data)
-                ;<Redirect to="/home" />
+                SetAdmin(response.data.is_admin)
+                response.data.is_admin === true ? (
+                    <Redirect to="/admin" />
+                ) : (
+                    <Redirect to="/home" />
+                )
             })
     }
 
@@ -79,6 +86,7 @@ const App = (props) => {
         ) : (
             <LoggedOutRouter myHelper={helper} SignIn={SignIn} />
         )
+        if (admin) content = <Admin />
 
         return content
     }
