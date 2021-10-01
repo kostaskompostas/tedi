@@ -23,14 +23,22 @@ import {
 } from "react-router-dom"
 
 const LoggedInRouter = (props) => {
-    console.log(props.myHelper.GetToken())
-
+    console.log(props.userInfo)
     let url = window.location.href
     let path = window.location.pathname
+    let myprops = {
+        userInfo: props.userInfo,
+        myHelper: props.myHelper,
+        FetchUserData: props.FetchUserData,
+    }
     return (
         <Router>
             <div>
-                <NavBar SignOut={props.SignOut} />
+                <NavBar
+                    SignOut={props.SignOut}
+                    userInfo={props.userInfo}
+                    myHelper={props.myHelper}
+                />
                 <Switch>
                     <Route exact path="/">
                         <Redirect to={"/home"}></Redirect>
@@ -41,6 +49,7 @@ const LoggedInRouter = (props) => {
                             <Home
                                 userInfo={props.userInfo}
                                 myHelper={props.myHelper}
+                                FetchUserData={props.FetchUserData}
                             />
                         )}
                     />
@@ -50,6 +59,7 @@ const LoggedInRouter = (props) => {
                             <Network
                                 userInfo={props.userInfo}
                                 myHelper={props.myHelper}
+                                FetchUserData={props.FetchUserData}
                             />
                         )}
                     />
@@ -59,6 +69,7 @@ const LoggedInRouter = (props) => {
                             <Jobs
                                 userInfo={props.userInfo}
                                 myHelper={props.myHelper}
+                                FetchUserData={props.FetchUserData}
                             />
                         )}
                     />
@@ -68,6 +79,7 @@ const LoggedInRouter = (props) => {
                             <Conversations
                                 userInfo={props.userInfo}
                                 myHelper={props.myHelper}
+                                FetchUserData={props.FetchUserData}
                             />
                         )}
                     />
@@ -78,15 +90,18 @@ const LoggedInRouter = (props) => {
                             <Notifications
                                 userInfo={props.userInfo}
                                 myHelper={props.myHelper}
+                                FetchUserData={props.FetchUserData}
                             />
                         )}
                     />
                     <Route
-                        path={"/account"}
-                        render={() => (
+                        path={`/account`}
+                        render={(exampleprops) => (
                             <Account
+                                {...exampleprops}
                                 userInfo={props.userInfo}
                                 myHelper={props.myHelper}
+                                FetchUserData={props.FetchUserData}
                             />
                         )}
                     />
@@ -94,6 +109,17 @@ const LoggedInRouter = (props) => {
                         path={"/settings"}
                         render={() => (
                             <Settings
+                                userInfo={props.userInfo}
+                                myHelper={props.myHelper}
+                                FetchUserData={props.FetchUserData}
+                            />
+                        )}
+                    />
+                    <Route
+                        path={`/viewaccount`}
+                        render={() => (
+                            <Account
+                                viewUser={props.userInfo.email}
                                 userInfo={props.userInfo}
                                 myHelper={props.myHelper}
                             />

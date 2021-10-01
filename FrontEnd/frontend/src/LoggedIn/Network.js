@@ -5,9 +5,9 @@ const Network = (props) => {
     const [users, SetUsers] = useState()
     const [searchString, SetSearchString] = useState("")
     const [searchResult, SetSearchResult] = useState()
-
-    const collaborators = props.userInfo.collaborators
-
+    useEffect(() => {
+        props.FetchUserData()
+    }, [])
     //console.log(collaborators)
     /*
 
@@ -32,6 +32,7 @@ const Network = (props) => {
             .then(
                 (response) => {
                     var temp = response.data.items
+                    console.log(response.data.items)
                     //add "isconnected" value so it can be checked later
                     //check if user is in collabs
                     /*temp = temp.map((user) => {
@@ -89,7 +90,30 @@ const Network = (props) => {
                 (error) => console.log(error)
             )
     }
-
+    const Connection = (props) => {
+        return (
+            <div className="d-flex align-items-center ">
+                <Avatar
+                    myHelper={props.myHelper}
+                    user_email={props.user_email}
+                    height={"40px"}
+                    width={"40px"}
+                />
+                {props.is_connected == false ? (
+                    <button
+                        onClick={(e) => OnConnect(e, props.user_email)}
+                        className="ms-2  btn-sm btn btn-success"
+                    >
+                        connect
+                    </button>
+                ) : (
+                    <button className="ms-2   btn btn-primary btn-sm ms-5">
+                        view profile
+                    </button>
+                )}
+            </div>
+        )
+    }
     return (
         <div className="d-flex flex-column justify-content-center">
             <input
@@ -98,28 +122,31 @@ const Network = (props) => {
                 placeholder="search for new connections"
             ></input>
             {searchString != "" ? (
-                <div>
+                <div className="border border-primary">
                     {searchResult.map((user) => (
-                        <div className="d-flex ">
-                            <Avatar
-                                myHelper={props.myHelper}
-                                key={user.email}
-                                user_email={user.email}
-                                height={"40px"}
-                                width={"40px"}
-                            />
-                            {!user.is_connected ? (
-                                <button
-                                    onClick={(e) => OnConnect(e, user.email)}
-                                    className="ms-2  btn-sm btn btn-success"
-                                >
-                                    connect
-                                </button>
-                            ) : null}
-                        </div>
+                        <Connection
+                            key={props.user_email}
+                            myHelper={props.myHelper}
+                            user_email={user.email}
+                            is_connected={user.is_connected}
+                        />
                     ))}
                 </div>
             ) : null}
+
+            <div className="d-flex flex-column">
+                <h2>Your network</h2>
+                <div>
+                    {props.userInfo.collaborators.map((user) => (
+                        <Connection
+                            key={user.email + 1}
+                            myHelper={props.myHelper}
+                            user_email={user.email}
+                            is_connected={true}
+                        />
+                    ))}
+                </div>
+            </div>
         </div>
     )
 }

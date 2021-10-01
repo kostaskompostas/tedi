@@ -1,11 +1,22 @@
 import { React, useEffect, useState } from "react"
+import {
+    BrowserRouter as Router,
+    Redirect,
+    Link,
+    useHistory,
+} from "react-router-dom"
 import axios from "axios"
 
 import autocomplete from "../../util/AutoComplete.js"
 import { Avatar, FormInput } from "../../util/util.js"
 
 const Account = (props) => {
+    //if the account you are about to view is the authorized user, allow changes
+    let isAuthorized = props.location.state.viewUser == props.userInfo.email
     console.log(props)
+    isAuthorized
+        ? console.log("user is viewing his own account")
+        : console.log("user is viewing someone elses account")
     let client = props.myHelper.client
     const listStyle = {
         overflowY: "auto",
@@ -44,14 +55,26 @@ const Account = (props) => {
     const [userInfo, setUserInfo] = useState()
     useEffect(() => {
         var token = props.myHelper.GetToken()
-        console.log(token)
+        client
+            .get("/api/user/?user_email=" + props.location.state.viewUser, {
+                headers: {
+                    Authorization: "Token " + props.myHelper.GetToken(),
+                },
+            })
+            .then(
+                (response) => {
+                    console.log(response.data)
+                    setUserInfo(response.data)
+                },
+                (error) => console.log(error)
+            )
+        /*
         client
             .get("/api/auth/", {
                 headers: { Authorization: "Token " + token },
             })
             .then(
                 (response) => {
-                    console.log(response.data)
                     setUserInfo(response.data)
                 },
                 (error) => {
@@ -62,22 +85,13 @@ const Account = (props) => {
         client.get("/api/skills/" + "?all").then((response) => {
             console.log(response.data.items)
             setAvailableSkills(response.data.items)
-            /*
-                    <select>
-                        {skills.map((skill) => (
-                            <option
-                                key={skill.skill_id}
-                                value={skill.skill_id}
-                            >
-                                {skill.skill_name}
-                            </option>
-                        ))}
-                    </select>
-                    */
-        })
+
+        })*/
     }, [])
 
-    const [userPicture, SetUserPicture] = useState()
+    const [userPicture, SetUserPicture] = useState(
+        props.userInfo.profile_picture
+    )
     const OnPictureChange = (e) => {
         e.preventDefault()
 
@@ -105,8 +119,8 @@ const Account = (props) => {
                         })
                         .then(
                             (response) => {
-                                console.log(response.data)
                                 setUserInfo(response.data)
+                                props.FetchUserData()
                             },
                             (error) => {
                                 console.log(error)
@@ -128,7 +142,6 @@ const Account = (props) => {
         e.preventDefault()
         const timeDelay = 1000
 
-        console.log(e.target)
         if (e.target.name == "first_name" && namesChanged.first_name == false) {
             setNamesChanged({ ...namesChanged, first_name: true })
             setTimeout(function () {
@@ -147,6 +160,7 @@ const Account = (props) => {
                         (error) => console.log(error)
                     )
                 setNamesChanged({ ...namesChanged, first_name: false })
+                props.FetchUserData()
             }, timeDelay)
         }
         if (e.target.name == "last_name" && namesChanged.last_name == false) {
@@ -167,6 +181,7 @@ const Account = (props) => {
                         (error) => console.log(error)
                     )
                 setNamesChanged({ ...namesChanged, last_name: false })
+                props.FetchUserData()
             }, timeDelay)
         }
         console.log("changed names")
@@ -197,29 +212,30 @@ const Account = (props) => {
     }
     const displayInfo = (type, array, title) => {
         let counter = 0
-        console.log(type)
         return (
             <div className="d-flex flex-column align-items-start ms-3">
                 <h4>{title}</h4>
                 <div className="border border-dark">
-                    <form
-                        autoComplete="off"
-                        className="d-flex align-items-center"
-                        onSubmit={(e) => OnSkillsSubmit(e)}
-                    >
-                        {
-                            <input
-                                className="m-3 p-3"
-                                type="text"
-                                name={type}
-                                placeholder="add new"
-                                onFocus={(e) => OnFocus(e)}
-                            ></input>
-                        }
-                        <button type="submit" className="btn btn-primary">
-                            +
-                        </button>
-                    </form>
+                    {isAuthorized ? (
+                        <form
+                            autoComplete="off"
+                            className="d-flex align-items-center"
+                            onSubmit={(e) => OnSkillsSubmit(e)}
+                        >
+                            {
+                                <input
+                                    className="m-3 p-3"
+                                    type="text"
+                                    name={type}
+                                    placeholder="add new"
+                                    onFocus={(e) => OnFocus(e)}
+                                ></input>
+                            }
+                            <button type="submit" className="btn btn-primary">
+                                +
+                            </button>
+                        </form>
+                    ) : null}
                     <ul style={listStyle} className="">
                         {array.map((entry) => (
                             <li key={type + counter++}>{entry}</li>
@@ -232,50 +248,82 @@ const Account = (props) => {
     return userInfo != undefined ? (
         <div className="d-flex flex-column align-items-center">
             <div className="d-flex flex-column align-items-start">
-                <h3>Your Personal Info</h3>
-                <div className="border border-primary">
-                    <form>
-                        <div className="d-flex p-2 align-items-end">
-                            <div className="d-flex flex-column">
-                                <Avatar
-                                    user_email={userInfo.email}
-                                    myHelper={props.myHelper}
-                                    avatarUrl={userInfo.profile_picture}
-                                    width="200px"
-                                    height="200px"
-                                />
+                <h3>
+                    {isAuthorized
+                        ? "Your Personal Info"
+                        : userInfo.first_name +
+                          " " +
+                          userInfo.last_name +
+                          "'s profile"}
+                </h3>
 
-                                <input
-                                    onChange={(e) => OnPictureChange(e)}
-                                    className="mt-2 float-left"
-                                    type="file"
-                                    name="profilePicture"
-                                    accept="image/*"
-                                ></input>
-                            </div>
-                            {
-                                <div
-                                    className="ps-3 d-flex"
-                                    onChange={(e) => OnNamesChange(e)}
-                                >
-                                    {FormInput(
-                                        "Name",
-                                        "text",
-                                        "first_name",
-                                        userInfo.first_name,
-                                        ""
-                                    )}
-                                    {FormInput(
-                                        "Surname",
-                                        "text",
-                                        "last_name",
-                                        userInfo.last_name,
-                                        "ms-2"
-                                    )}
+                <div className="border border-primary">
+                    {isAuthorized ? (
+                        <form>
+                            <div className="d-flex p-2 align-items-end">
+                                <div className="d-flex flex-column">
+                                    <img
+                                        src={
+                                            props.myHelper.GetBaseUrl() +
+                                            userInfo.profile_picture
+                                        }
+                                        width="200px"
+                                        height="200px"
+                                    />
+
+                                    <input
+                                        onChange={(e) => OnPictureChange(e)}
+                                        className="mt-2 float-left"
+                                        type="file"
+                                        name="profilePicture"
+                                        accept="image/*"
+                                    ></input>
                                 </div>
-                            }
+                                {
+                                    <div
+                                        className="ps-3 d-flex"
+                                        onChange={(e) => OnNamesChange(e)}
+                                    >
+                                        {FormInput(
+                                            "Name",
+                                            "text",
+                                            "first_name",
+                                            userInfo.first_name,
+                                            ""
+                                        )}
+                                        {FormInput(
+                                            "Surname",
+                                            "text",
+                                            "last_name",
+                                            userInfo.last_name,
+                                            "ms-2"
+                                        )}
+                                    </div>
+                                }
+                            </div>
+                        </form>
+                    ) : (
+                        <div>
+                            <div className="d-flex p-2 align-items-end">
+                                <div className="d-flex flex-column">
+                                    <img
+                                        src={
+                                            props.myHelper.GetBaseUrl() +
+                                            userInfo.profile_picture
+                                        }
+                                        width="200px"
+                                        height="200px"
+                                    />
+                                </div>
+                                <h3 className="ms-5">
+                                    {userInfo.first_name +
+                                        " " +
+                                        userInfo.last_name}
+                                </h3>
+                                <h3>{userInfo.is_connected}</h3>
+                            </div>
                         </div>
-                    </form>
+                    )}
                     <div className="d-flex mt-5">
                         {displayInfo(
                             "work",
