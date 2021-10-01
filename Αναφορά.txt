@@ -43,15 +43,30 @@ python manage.py runserver
 Η πρόσβαση στο admin panel του django γίνεται στον BackEnd server στη διεύθυνση (localhost:8000/admin), ενώ τα endpoints μπορούν να ελεγχθούν με το HTML interface
 του django rest framework στις διεθύνσεις (localhost:8000/api/*)
 
+Για το front end , ισχυουν τα παρακατω:
 Λειτουργούν πλήρως:
 Home page
 Network
 Conversations
 Notifications
 Settings
+
 Μερικώς:
 Account (χωρις τα skills)
 
+Δεν υλοποιηθηκαν :
+job offers
+admin page
+skils/work/education στο account
+
+-------users-----
+username       password
+   ^              ^
+test@test.com  1234
+test2@test.com 1234 
+test3@test.com 1234
+test4@test.com 1234
+user@user.com  password
 
 
 
