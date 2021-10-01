@@ -9,24 +9,7 @@ import TimeLine from "./TimeLine.js"
 function Home(props) {
     let client = props.myHelper.client
 
-    const [userInfo, setUserInfo] = useState("")
-    useEffect(() => {
-        var token = props.myHelper.GetToken()
-        console.log(token)
-        client
-            .get("/api/auth/", {
-                headers: { Authorization: "Token " + token },
-            })
-            .then(
-                (response) => {
-                    console.log(response.data)
-                    setUserInfo(response.data)
-                },
-                (error) => {
-                    console.log(error)
-                }
-            )
-    }, [])
+    const [userInfo, setUserInfo] = useState(props.userInfo)
 
     return (
         <div className="d-flex m-4">

@@ -37,36 +37,67 @@ const LoggedInRouter = (props) => {
                     </Route>
                     <Route
                         path={`/home`}
-                        render={() => <Home myHelper={props.myHelper} />}
+                        render={() => (
+                            <Home
+                                userInfo={props.userInfo}
+                                myHelper={props.myHelper}
+                            />
+                        )}
                     />
                     <Route
                         path={`/network`}
-                        render={() => <Network myHelper={props.myHelper} />}
+                        render={() => (
+                            <Network
+                                userInfo={props.userInfo}
+                                myHelper={props.myHelper}
+                            />
+                        )}
                     />
                     <Route
                         path={"/jobs"}
-                        render={() => <Jobs myHelper={props.myHelper} />}
+                        render={() => (
+                            <Jobs
+                                userInfo={props.userInfo}
+                                myHelper={props.myHelper}
+                            />
+                        )}
                     />
                     <Route
                         path={"/conversations"}
                         render={() => (
-                            <Conversations myHelper={props.myHelper} />
+                            <Conversations
+                                userInfo={props.userInfo}
+                                myHelper={props.myHelper}
+                            />
                         )}
                     />
 
                     <Route
                         path={"/notifications"}
                         render={() => (
-                            <Notifications myHelper={props.myHelper} />
+                            <Notifications
+                                userInfo={props.userInfo}
+                                myHelper={props.myHelper}
+                            />
                         )}
                     />
                     <Route
                         path={"/account"}
-                        render={() => <Account myHelper={props.myHelper} />}
+                        render={() => (
+                            <Account
+                                userInfo={props.userInfo}
+                                myHelper={props.myHelper}
+                            />
+                        )}
                     />
                     <Route
                         path={"/settings"}
-                        render={() => <Settings myHelper={props.myHelper} />}
+                        render={() => (
+                            <Settings
+                                userInfo={props.userInfo}
+                                myHelper={props.myHelper}
+                            />
+                        )}
                     />
                 </Switch>
             </div>

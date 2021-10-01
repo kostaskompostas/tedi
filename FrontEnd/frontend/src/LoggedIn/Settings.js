@@ -7,24 +7,7 @@ const Settings = (props) => {
     let emailHasChanged = false
     let passwordHasChanged = false
 
-    const [userInfo, setUserInfo] = useState("")
-    useEffect(() => {
-        var token = props.myHelper.GetToken()
-        console.log(token)
-        client
-            .get("/api/auth/", {
-                headers: { Authorization: "Token " + token },
-            })
-            .then(
-                (response) => {
-                    console.log(response.data)
-                    setUserInfo(response.data)
-                },
-                (error) => {
-                    console.log(error)
-                }
-            )
-    }, [])
+    const [userInfo, setUserInfo] = useState(props.userInfo)
 
     let profile = {
         email: userInfo.email,
