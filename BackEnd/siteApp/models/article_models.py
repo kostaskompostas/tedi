@@ -66,4 +66,23 @@ class Like(models.Model):
     user = models.ForeignKey(User,on_delete=models.CASCADE)
 
 
+class Notification(models.Model):
+    """This model represents a notification that one receives when
+    one of his articles is liked or commented on"""
+
+    #The user that performed the like or the comment
+    user = models.ForeignKey(User,on_delete=models.CASCADE)
+
+    #The article that was liked or commented on
+    #Receiving user is implicitly acquired (article author)
+    article = models.ForeignKey(Article,on_delete=models.CASCADE)
+
+    #This states whether the notification was due to a comment or not (meaning a like)
+    comment = models.BooleanField(default=False)
+
+    #The date on which the notification was created
+    date = models.DateField(auto_now_add=True)
+
+
+
 #FOR VIDEOS WE DON'T KNOW YET

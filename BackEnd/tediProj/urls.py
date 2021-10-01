@@ -32,7 +32,8 @@ urlpatterns = [
     path('api/collab/',views.CollabView.as_view(),name = "collaboaration"),
     path('api/offers/interest/',views.OfferInterestView.as_view(),name = "offerintrerest"),
     path('api/articles/',views.ArticleView.as_view(),name="articles"),
-    path('api/articles/interact/',views.ArticleInteractionView.as_view(),name = "interarticle")
+    path('api/articles/interact/',views.ArticleInteractionView.as_view(),name = "interarticle"),
+    path('api/notif/',views.NotificationView.as_view(),name="notification")
 ]
 
 
