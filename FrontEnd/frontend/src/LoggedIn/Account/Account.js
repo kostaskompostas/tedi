@@ -13,7 +13,7 @@ import { Avatar, FormInput } from "../../util/util.js"
 const Account = (props) => {
     //if the account you are about to view is the authorized user, allow changes
     let isAuthorized = props.location.state.viewUser == props.userInfo.email
-    console.log(props)
+    //console.log(props)
     isAuthorized
         ? console.log("user is viewing his own account")
         : console.log("user is viewing someone elses account")
@@ -52,6 +52,7 @@ const Account = (props) => {
         return skills
     }
 
+    //gets user info
     const [userInfo, setUserInfo] = useState()
     useEffect(() => {
         var token = props.myHelper.GetToken()
@@ -188,11 +189,19 @@ const Account = (props) => {
     }
 
     const [availableSkills, setAvailableSkills] = useState()
+    useEffect(() => {
+        client
+            .get("/api/skills/?all")
+            .then((response) => console.log(response.data))
+        client
+            .get("/api/edu/?all")
+            .then((response) => console.log(response.data))
+    }, [])
     const OnSkillsSubmit = (e) => {
         e.preventDefault()
         //api/skills
         //api/edu
-        client.get("/api/skills/" + "?all/").then((response) => {
+        client.get("/api/skills/" + "?all").then((response) => {
             console.log(response.data)
         })
         console.log("skill submit")
@@ -213,7 +222,7 @@ const Account = (props) => {
     const displayInfo = (type, array, title) => {
         let counter = 0
         return (
-            <div className="d-flex flex-column align-items-start ms-3">
+            <div className="d-flex flex-column align-items-start ms-3 p-1">
                 <h4>{title}</h4>
                 <div className="border border-dark">
                     {isAuthorized ? (
@@ -231,7 +240,10 @@ const Account = (props) => {
                                     onFocus={(e) => OnFocus(e)}
                                 ></input>
                             }
-                            <button type="submit" className="btn btn-primary">
+                            <button
+                                type="submit"
+                                className="btn btn-primary p-1"
+                            >
                                 +
                             </button>
                         </form>

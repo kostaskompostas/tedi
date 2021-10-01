@@ -156,7 +156,27 @@ function Article(props) {
                 (error) => console.log(error.data)
             )
     }
-
+    const OnArticleDelete = (e, article_id) => {
+        console.log(article_id)
+        client
+            .delete("api/articles/", {
+                headers: {
+                    Authorization: "Token " + props.myHelper.GetToken(),
+                },
+                data: {
+                    article_id: article_id,
+                },
+            })
+            .then(
+                (response) => {
+                    console.log(response.data)
+                    if (props.RefreshTimeline != undefined)
+                        props.RefreshTimeline()
+                },
+                (error) => console.log(error.data)
+            )
+        //delete this
+    }
     let commentsInfo = (
         <div className="d-flex flex-column mt-2">
             <form className="d-flex " onSubmit={(e) => OnCommentSubmit(e)}>
@@ -199,7 +219,7 @@ function Article(props) {
                     {article.user_email === props.userInfo.email ? (
                         <button
                             onClick={(e) =>
-                                props.OnArticleDelete(e, article.article_id)
+                                OnArticleDelete(e, article.article_id)
                             }
                             className="float-right btn-danger"
                         >
