@@ -1,0 +1,51 @@
+Αναφορά εργασίας ΤΕΔΙ:
+
+Μικρούδης Κωνσταντίνος, sdi1700089
+Μποζίκης Λουκάς, sdi1700098
+
+Στα πλαίσια της εργασίας υλοποιήθηκε ένα web application το οποίο προσομοιάζει τα
+features του δημοφιλούς website επαγγελματικής δικτύωσης LinkedIn.
+
+Αρχικα, στον φάκελο FrontEnd βρίσκονται τα wireframes που βοήθησαν στην αρχική σχεδίαση
+του interface.
+
+Για την κατασκευή του χρήσημοποιήθηκε το framework django στην υλοποίηση του Back-End
+(μαζί με το πρόσθετο django rest framework για τη δημιουργία του REST API),
+καθώς και οι βιβλιοθήκη Pillow για την επεξεργασία φωτογραφιών.
+
+Στο Front-End χρησιμοποιήθηκε η βιβλιοθήκη React για τη γενική διάρθρωση του website, και
+η βιβλιοθήκη axios για την αποτελεσματική επικοινωνία με το API.
+
+Η σελίδα ακολουθεί το μοντέλο σχεδίασης One-Page application. Oλη η επικοινωνία με το BackEnd και τη βάση
+γίνεται μέσω του API. Για λόγους εύκολης συνεργασίας, το BackEnd και το FrontEnd έχουν τοποθετηθεί σε διαφορετικούς
+servers. O κώδικας έχει τοποθετηθεί στους φακέλους FrontEnd και BackEnd για το κάθε κομμάτι της εργασίας.
+
+Η εγκατάσταση των βιβλιοθηκών του FrontEnd γίνεται με τις εντολές:
+cd <projectroot>/FrontEnd
+npm install
+Ενώ η εκτέλεση του demo react server με την εντολή "npm start", τρέχοντας τον σερβερ στη διευθυνση localhost:3000
+(Το npm διατίθεται ως μέρος του node.js το οποίο πρέπει να είναι εγκατεστημένο)
+
+Για το BackEnd η εγκατάσταση των απαραίτητων βιβλιοθηκών γίνεται με τις εντολες
+pip install django
+pip install djangorestframework
+pip install Pillow
+
+Ο σερβερ ξεκινά με τις εντολες
+cd <projectroot>/BackEnd
+python manage.py runserver
+Με αυτόν τον τρόπο θα εκκινηθεί ο BackEnd server στη διεύθυνση localhost:8000
+
+Με την επιτυχή εκκίνηση των δυο server, η εφαρμογή εκτελείται στον browser της επιλογής
+στη διευθυνση του FrontEnd server (localhost:3000)
+Η πρόσβαση στο admin panel του django γίνεται στον BackEnd server στη διεύθυνση (localhost:8000/admin), ενώ τα endpoints μπορούν να ελεγχθούν με το HTML interface
+του django rest framework στις διεθύνσεις (localhost:8000/api/*)
+
+
+
+
+
+
+
+
+
