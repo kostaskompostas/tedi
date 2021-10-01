@@ -44,6 +44,7 @@ python manage.py runserver
 του django rest framework στις διεθύνσεις (localhost:8000/api/*)
 
 Για το front end , ισχυουν τα παρακατω:
+->
 Λειτουργούν πλήρως:
 Home page
 Network
@@ -58,6 +59,11 @@ Account (χωρις τα skills)
 job offers
 admin page
 skils/work/education στο account
+<-
+
+->
+Για το back end, το μονο που δεν υλοποιηθηκε ειναι το admin κομματι της σελιδας
+<-
 
 -------users-----
 username       password
