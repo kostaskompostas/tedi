@@ -55,7 +55,7 @@ function Avatar(props) {
         <Link
             className="d-flex p-2 align-items-center"
             to={{
-                pathname: "/account",
+                pathname: props.disableOnClick == undefined ? "/account" : "",
                 state: { viewUser: userInfo.email },
             }}
         >

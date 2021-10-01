@@ -2,6 +2,7 @@ import { React, useEffect, useState } from "react"
 import axios from "axios"
 import profilepic from "../icons/profile.png"
 import { Avatar } from "../util/util"
+import Article from "./Home/Article"
 
 const Notifications = (props) => {
     const [conRequests, setConRequests] = useState()
@@ -17,11 +18,28 @@ const Notifications = (props) => {
             })
             .then(
                 (response) => {
-                    setConRequests(response.data.items)
-                    console.log(response.data)
+                    setConRequests(response.data.items.reverse())
+                    //console.log(response.data)
                 },
                 (error) => console
             )
+    }
+
+    const [notif, SetNotif] = useState()
+    useEffect(() => {
+        FetchNotif()
+    }, [])
+    const FetchNotif = () => {
+        client
+            .get("/api/notif/", {
+                headers: {
+                    Authorization: "Token " + props.myHelper.GetToken(),
+                },
+            })
+            .then((response) => {
+                console.log(response.data.items)
+                SetNotif(response.data.items.reverse())
+            })
     }
 
     let client = props.myHelper.client
@@ -34,6 +52,52 @@ const Notifications = (props) => {
 
     const actionStyle = {
         width: "8rem",
+    }
+    const [showPreview, SetShowPreview] = useState(false)
+    function TogglePreview() {
+        SetShowPreview((prev) => !prev)
+    }
+    const modalStyle = {
+        display: "none",
+        position: "fixed",
+        zIndex: 1,
+        "background-color": "rgba(0, 0, 0, 0.25)",
+    }
+    const modalContent = {
+        backgroundColor: "white",
+        position: "absolute",
+    }
+    const [previewArticle, SetPreviewArticle] = useState()
+    const ViewNotifArticle = (e, article_id) => {
+        e.preventDefault()
+        client
+            .get(
+                "/api/articles/?user_email=" +
+                    props.userInfo.email +
+                    "&user=true",
+
+                {
+                    headers: {
+                        Authorization: "Token " + props.myHelper.GetToken(),
+                    },
+                }
+            )
+            .then(
+                (response) => {
+                    console.log(response.data)
+                    var flag = -1
+                    for (var i = 0; i < response.data.items.length; i++) {
+                        if (response.data.items[i].article_id == article_id)
+                            flag = i
+                    }
+                    console.log(flag)
+                    if (flag != -1) {
+                        SetPreviewArticle(response.data.items[flag])
+                        TogglePreview()
+                    }
+                },
+                (error) => console.log(error)
+            )
     }
 
     const OnConnectionAccept = (e, email) => {
@@ -133,25 +197,50 @@ const Notifications = (props) => {
             </div>
             <div className="d-flex flex-column align-items start">
                 <h3>Interest notifications</h3>
+                {showPreview ? (
+                    <Article
+                        style={modalStyle}
+                        userInfo={props.userInfo}
+                        myHelper={props.myHelper}
+                        data={previewArticle}
+                    />
+                ) : null}
                 <div
                     style={scrollstyle}
-                    className="border border-primary d-flex flex-column"
+                    className="border border-primary d-flex flex-column "
                 >
-                    {/*interests.map((event) => (
-                        <div
-                            key={"notif" + notifCounter++}
-                            className="d-flex justify-content-between align-items-center m-1"
-                        >
-                            <img src={profilepic} height="30px" width="30px" />
-                            <div className=" text-left">
-                                {event.name + " " + event.surname}
-                            </div>
-                            <div className=" text-left" style={actionStyle}>
-                                {event.action}
-                            </div>
-                            <button>{event.subject}</button>
-                        </div>
-                    ))*/}
+                    {notif != undefined
+                        ? notif.map((event) => (
+                              <div
+                                  key={event.notification_ids}
+                                  className="d-flex justify-content-between align-items-center m-1"
+                              >
+                                  <Avatar
+                                      user_email={event.user_from_email}
+                                      myHelper={props.myHelper}
+                                      width="50px"
+                                      height="50px"
+                                      hideName={true}
+                                  />
+                                  <div className=" text-left">
+                                      {event.message}
+                                  </div>
+                                  <div
+                                      className=" text-left"
+                                      style={actionStyle}
+                                  >
+                                      <span>{"on " + event.date}</span>
+                                  </div>
+                                  <button
+                                      onClick={(e) =>
+                                          ViewNotifArticle(e, event.article_id)
+                                      }
+                                  >
+                                      {"view article"}
+                                  </button>
+                              </div>
+                          ))
+                        : null}
                 </div>
             </div>
         </div>

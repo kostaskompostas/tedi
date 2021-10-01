@@ -121,13 +121,13 @@ function TimeLine(props) {
             .then(
                 (response) => {
                     console.log(response.data)
-                    RefreshTimeline()
+                    if (props.RefreshTimeline != undefined)
+                        props.RefreshTimeline()
                 },
                 (error) => console.log(error.data)
             )
         //delete this
     }
-
     function RefreshTimeline() {
         FetchArticles()
     }
@@ -198,7 +198,7 @@ function TimeLine(props) {
                           userInfo={props.userInfo}
                           data={article}
                           myHelper={props.myHelper}
-                          OnArticleDelete={OnArticleDelete}
+                          RefreshTimeline={RefreshTimeline}
                       />
                   ))}
         </div>
