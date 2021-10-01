@@ -3,12 +3,12 @@ import axios from "axios"
 import { Avatar } from "../util/util.js"
 const Conversations = (props) => {
     let client = props.myHelper.client
-    const [connections, SetConnections] = useState(props.userInfo.collaborators)
-    const [selectedUser, SetSelectedUser] = useState(
-        props.userInfo.collaborators.length != 0
+    let temp =
+        props.userInfo.collaborators.length > 0
             ? props.userInfo.collaborators[0].email
-            : {}
-    )
+            : undefined
+    const [connections, SetConnections] = useState(props.userInfo.collaborators)
+    const [selectedUser, SetSelectedUser] = useState(temp)
     const contactsStyle = {
         overflowY: "auto",
         border: "3px solid black",
@@ -27,12 +27,26 @@ const Conversations = (props) => {
         position: "relative",
     }
 
-    const [flag, SetFlag] = useState(false)
     const [messages, SetMessages] = useState()
-    let messagesCheckpoint = 0
+
+    console.log(props.userInfo.collaborators.length)
     const Refresh = () => {
-        FetchMessages(selectedUser)
+        //check for connections to  see if someone new has started talking
+        props.myHelper.client
+            .get("/api/auth/", {
+                headers: {
+                    Authorization: "Token " + props.myHelper.GetToken(),
+                },
+            })
+            .then((response) => {
+                SetConnections(response.data.collaborators)
+                if (response.data.collaborators.length > 0) {
+                    SetSelectedUser(response.data.collaborators[0].email)
+                    FetchMessages(response.data.collaborators[0].email) //check for messages on selected user
+                }
+            })
     }
+
     useEffect(() => {
         var handle = setInterval(Refresh, 5000)
         return () => {
@@ -40,8 +54,8 @@ const Conversations = (props) => {
         }
     })
     useEffect(() => {
-        console.log(selectedUser)
-    }, [selectedUser])
+        Refresh()
+    }, [])
     const FetchMessages = (other_user_email) => {
         console.log(other_user_email)
         if (selectedUser === undefined) return

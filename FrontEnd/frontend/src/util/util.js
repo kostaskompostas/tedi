@@ -39,7 +39,6 @@ function Avatar(props) {
         client.get("/api/user/" + "?user_email=" + props.user_email).then(
             (response) => {
                 SetUserInfo(response.data)
-                console.log(response.data)
             },
             (error) => console.log(error)
         )

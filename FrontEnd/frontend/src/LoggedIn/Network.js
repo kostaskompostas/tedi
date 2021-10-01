@@ -90,6 +90,24 @@ const Network = (props) => {
                 (error) => console.log(error)
             )
     }
+    const OnConnectionDelete = (e, email) => {
+        console.log(email)
+        e.preventDefault()
+        client
+            .post(
+                "/api/collab/",
+                { uncollab: "true", user_email: email },
+                {
+                    headers: {
+                        Authorization: "Token " + props.myHelper.GetToken(),
+                    },
+                }
+            )
+            .then(
+                (response) => console.log(response.data),
+                (error) => console.log(error)
+            )
+    }
     const Connection = (props) => {
         return (
             <div className="d-flex align-items-center ">
@@ -107,8 +125,11 @@ const Network = (props) => {
                         connect
                     </button>
                 ) : (
-                    <button className="ms-2   btn btn-primary btn-sm ms-5">
-                        view profile
+                    <button
+                        onClick={(e) => OnConnectionDelete(e, props.user_email)}
+                        className="ms-2   btn btn-danger btn-sm ms-5"
+                    >
+                        delete connection
                     </button>
                 )}
             </div>
