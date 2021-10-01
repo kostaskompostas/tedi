@@ -93,7 +93,7 @@ class UserView(APIView):
                 collab = check_users_collaboration(request.user,user) or request.user==user
             
             #Finally return the user as a response
-            return Response(convert_user_to_dictionary(user,collab))
+            return Response(convert_user_to_dictionary(user,collab,request))
 
         #If the user email was not specified, return a list of all users
         return response_from_queryset(app_models.User.objects.filter(is_superuser=False,is_staff=False),lambda x: convert_user_to_dictionary(x,False,request))
