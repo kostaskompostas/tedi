@@ -25,7 +25,7 @@ class MessengerView(APIView):
             return response_message(False,"You are not logged in and can't see the conversation")
 
         #Parse the parameters
-        request_data = request.data
+        request_data = request.query_params
 
         #Check if you have provided the required parameters
         if not check_dict_contains_keys(request_data,['user_email','conversation_from']):
