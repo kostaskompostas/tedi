@@ -1,4 +1,4 @@
-import React, { Component, useState, useeffect } from "react"
+import React, { Component, useState, usEffect } from "react"
 import { Redirect } from "react-router-dom"
 
 import "./App.css"
@@ -8,31 +8,42 @@ import LoggedOutRouter from "./LoggedOut/LoggedOutRouter"
 import LoggedInRouter from "./LoggedIn/LoggedInRouter"
 import Helper from "./util/Helper"
 import { render } from "@testing-library/react"
-class App extends Component {
-    state = { logged: false, token: true, helper: new Helper() }
+const App = (props) => {
+    const [helper, SetHelper] = useState(new Helper())
+    const [logged, SetLogged] = useState(false)
+    const [userInfo, SetUserInfo] = useState()
 
-    SignIn = (newToken) => {
-        this.setState({ ...this.state, logged: true })
+    const FetchUserData = () => {
+        helper.client
+            .get("/api/auth/", {
+                headers: { Authorization: "Token " + helper.GetToken() },
+            })
+            .then((response) => {
+                console.log("APP LOGIN RESPONSE")
+                console.log(response.data.email)
+                SetUserInfo(response.data)
+            })
+    }
 
-        const foo = (prevstate, newToken) => prevstate.helper.SetToken(newToken)
-        foo(this.state, newToken)
+    const SignIn = (newToken) => {
+        SetLogged(true)
+        helper.SetToken(newToken)
 
         //auth and set user info
-        this.state.helper.client
+        helper.client
             .get("/api/auth/", {
                 headers: { Authorization: "Token " + newToken },
             })
             .then((response) => {
                 console.log("APP LOGIN RESPONSE")
                 console.log(response.data.email)
-                this.setState({ userInfo: response.data })
-                console.log(this.state)
+                SetUserInfo(response.data)
                 ;<Redirect to="/home" />
             })
     }
 
-    SignOut = () => {
-        this.state.helper.client
+    const SignOut = () => {
+        helper.client
             .post(
                 "/api/auth/",
                 {
@@ -41,14 +52,14 @@ class App extends Component {
                 },
                 {
                     headers: {
-                        Authorization: "Token " + this.state.helper.GetToken(),
+                        Authorization: "Token " + helper.GetToken(),
                     },
                 }
             )
             .then(
                 (response) => {
                     console.log(response.data.message)
-                    this.setState({ ...this.state, token: "", logged: false })
+                    SetLogged(false)
                 },
                 (error) => {
                     console.log(error)
@@ -57,26 +68,22 @@ class App extends Component {
         ;<Redirect push to="/" />
     }
 
-    GetContent() {
-        let content = this.state.logged ? (
+    function GetContent() {
+        let content = logged ? (
             <LoggedInRouter
-                userInfo={this.state.userInfo}
-                myHelper={this.state.helper}
-                SignOut={this.SignOut}
+                FetchUserData={FetchUserData}
+                userInfo={userInfo}
+                myHelper={helper}
+                SignOut={SignOut}
             />
         ) : (
-            <LoggedOutRouter
-                myHelper={this.state.helper}
-                SignIn={this.SignIn}
-            />
+            <LoggedOutRouter myHelper={helper} SignIn={SignIn} />
         )
 
         return content
     }
 
-    render() {
-        return this.GetContent()
-    }
+    return GetContent()
 }
 
 export default App

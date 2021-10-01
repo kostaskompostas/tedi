@@ -3,7 +3,10 @@ import profilePic from "../../icons/profile.png"
 import { propTypes } from "react-bootstrap/esm/Image"
 import { React, useEffect, useState } from "react"
 export default function Profile(props) {
-    const [connections, SetConnections] = useState()
+    const [connections, SetConnections] = useState(props.userInfo.collaborators)
+    useEffect(() => {
+        props.FetchUserData()
+    }, [])
 
     const connStyle = {
         overflowY: "auto",
@@ -14,36 +17,7 @@ export default function Profile(props) {
     }
 
     //connections should also be buttons that take you to their profile page
-    const getConnections = () => {
-        let connections = [
-            {
-                first_name: "Johnathan",
-                last_name: "Joestar",
-                email: "bazinga@lol.com",
-            },
-            {
-                first_name: "Jotaro",
-                last_name: "kujo",
-                email: "bazinga@lol.com",
-            },
-            {
-                first_name: "Dio",
-                last_name: "Brando",
-                email: "bazinga@lol.com",
-            },
-            {
-                first_name: "Arthur",
-                last_name: "Morgan",
-                email: "bazinga@lol.com",
-            },
-            {
-                first_name: "Johnathan",
-                last_name: "Joestar",
-                email: "bazinga@lol.com",
-            },
-        ]
-        return connections
-    }
+
     return (
         <div className="d-flex flex-column align-items-start">
             <div className="d-flex flex-column bg-info p-3 border border-dark rounded">
@@ -67,14 +41,14 @@ export default function Profile(props) {
                 <div className="d-flex flex-column mt-4">
                     <h2>Connections</h2>
                     <ul key="connections" style={connStyle} className="">
-                        {props.userInfo.collaborators != undefined
-                            ? props.userInfo.collaborators.map((person) => (
+                        {connections != undefined
+                            ? connections.map((person) => (
                                   <li key={person.email} className="d-flex p-2">
                                       <Avatar
                                           user_email={person.email}
                                           myHelper={props.myHelper}
-                                          width="40px"
-                                          height="40px"
+                                          width="80px"
+                                          height="80px"
                                           userName={
                                               person.first_name +
                                               " " +

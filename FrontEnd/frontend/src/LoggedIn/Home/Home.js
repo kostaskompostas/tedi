@@ -9,12 +9,18 @@ import TimeLine from "./TimeLine.js"
 function Home(props) {
     let client = props.myHelper.client
 
-    const [userInfo, setUserInfo] = useState(props.userInfo)
-
     return (
         <div className="d-flex m-4">
-            <Profile myHelper={props.myHelper} userInfo={userInfo} />
-            <TimeLine myHelper={props.myHelper} userInfo={userInfo} />
+            <Profile
+                FetchUserData={props.FetchUserData}
+                myHelper={props.myHelper}
+                userInfo={props.userInfo}
+            />
+            <TimeLine
+                FetchUserData={props.FetchUserData}
+                myHelper={props.myHelper}
+                userInfo={props.userInfo}
+            />
         </div>
     )
 }

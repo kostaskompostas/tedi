@@ -52,6 +52,27 @@ const Notifications = (props) => {
                 (response) => {
                     console.log(response.data)
                     FetchRequests()
+                    props.FetchUserData() //refresh user data so new collaborations can be shown
+                },
+                (error) => console.log(error)
+            )
+    }
+    const OnConnectionDecline = (e, email) => {
+        e.preventDefault()
+        client
+            .post(
+                "/api/collab/",
+                { decline: true, user_email: email },
+                {
+                    headers: {
+                        Authorization: "Token " + props.myHelper.GetToken(),
+                    },
+                }
+            )
+            .then(
+                (response) => {
+                    console.log(response.data)
+                    FetchRequests()
                 },
                 (error) => console.log(error)
             )
@@ -93,7 +114,15 @@ const Notifications = (props) => {
                                       >
                                           Accept
                                       </button>
-                                      <button className="btn btn-danger m-1 btn-sm">
+                                      <button
+                                          onClick={(e) =>
+                                              OnConnectionDecline(
+                                                  e,
+                                                  request.user_from_email
+                                              )
+                                          }
+                                          className="btn btn-danger m-1 btn-sm"
+                                      >
                                           Ignore
                                       </button>
                                   </div>
