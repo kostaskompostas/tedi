@@ -26,29 +26,15 @@ const Account = (props) => {
     }
 
     const getPrevWork = () => {
-        let prev = [
-            "spambot at twich",
-            "music bot at discord",
-            "champion bot in league",
-            "apex legends dummy target in practice range",
-            "dummy target in valorant target practice",
-            "punchbag in super smash bros",
-            "tutorial enemy in metal gear rising revengeance",
-            "mechon in xenoblade chronicles 1,X,2",
-        ]
+        let prev = []
         return prev
     }
     const getEdu = () => {
-        let edu = [
-            "pepega primary school",
-            "pogchamp junior high",
-            "omegalul high school",
-            "kekw college",
-        ]
+        let edu = []
         return edu
     }
     const getSkills = () => {
-        let skills = ["video editing", "music producing", "meme making"]
+        let skills = []
         return skills
     }
 
