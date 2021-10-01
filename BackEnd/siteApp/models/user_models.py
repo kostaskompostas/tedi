@@ -141,4 +141,3 @@ class UserSkill(models.Model):
 
     #Is this skill information private to non collaborators
     private = models.BooleanField()
-

@@ -53,6 +53,19 @@ def convert_user_to_dictionary(user, see_private,request=None):
     #Return the complete dictionary
     return final_dict
 
+def convert_notification_to_dictionary(notification):
+    """This will convert a notification model to a python dictionary"""
+
+    usr = notification.user
+
+    return {
+        'notification_id':notification.id,
+        'user_from_email':usr.email,
+        'date':str(notification.date),
+        'message': "User "+usr.first_name+" "+usr.last_name+" "+("commented on " if notification.comment else "liked ")+"one of your posts.",
+        'article_id':notification.article.id
+    }
+
 class UserView(APIView):
 
     #  In theory these parsers are already been used by the django rest framework
@@ -80,7 +93,7 @@ class UserView(APIView):
                 collab = check_users_collaboration(request.user,user) or request.user==user
             
             #Finally return the user as a response
-            return Response(convert_user_to_dictionary(user,collab))
+            return Response(convert_user_to_dictionary(user,collab,request))
 
         #If the user email was not specified, return a list of all users
         return response_from_queryset(app_models.User.objects.filter(is_superuser=False,is_staff=False),lambda x: convert_user_to_dictionary(x,False,request))
@@ -345,7 +358,23 @@ class AuthView(APIView):
 
             #Finaly send the success response
             return response_message(True,"You successfully logged out")
-    
+
+class NotificationView(APIView):
+    """This endpoint will only fetch the notifications for a specific user"""
+
+    def get(self,request,format=None):
+        """This will fetch all the requests that are sent to the logged in user"""
+
+        #Check that you are logged in
+        if not request.user.is_authenticated:
+            return response_message(False,"You must be logged in to view your notifications")
+
+        #Fetch all the notifications that are done one one of your articles
+        notifications = app_models.Notification.objects.filter(article__author=request.user)
+
+        #Return them in the appropriate format
+        return response_from_queryset(notifications,convert_notification_to_dictionary)
+
 class CollabView(APIView):
     """This class is used for making collaboration requests
     Answering collaboration requests, and declining them

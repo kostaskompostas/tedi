@@ -321,6 +321,13 @@ class ArticleInteractionView(APIView):
                 comment.article = article
                 comment.save()
 
+                #Finally construct a notification for the comment and save that as well
+                notif = app_models.Notification()
+                notif.article = article
+                notif.user = request.user
+                notif.comment = True
+                notif.save()
+
                 
                 return response_message(True,"The comment for the article was successfully saved")
             except:
@@ -365,6 +372,13 @@ class ArticleInteractionView(APIView):
                     #Change the number of likes on the article and save it
                     article.num_likes += 1
                     article.save()
+
+                    #Finally construct a notification for the comment and save that as well
+                    notif = app_models.Notification()
+                    notif.article = article
+                    notif.user = request.user
+                    notif.comment = False
+                    notif.save()
 
                     return response_message(True,"You liked the article successfully")
                 except:
