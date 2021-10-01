@@ -34,6 +34,8 @@ def convert_user_to_dictionary(user, see_private,request=None):
 
     if request != None and request.user.is_authenticated:
         final_dict['is_connected'] = check_users_collaboration(user,request.user)
+    
+    final_dict['is_admin'] = user.is_superuser
 
     #Write the public parts that need permission
     if not user.phone_private:
