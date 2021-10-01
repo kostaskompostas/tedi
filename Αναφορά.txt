@@ -59,6 +59,15 @@ job offers
 admin page
 skils/work/education στο account
 
+-------users-----
+username       password
+   ^              ^
+test@test.com  1234
+test2@test.com 1234 
+test3@test.com 1234
+test4@test.com 1234
+user@user.com  password
+
 
 
 
