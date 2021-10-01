@@ -28,7 +28,7 @@ class MessengerView(APIView):
         request_data = request.data
 
         #Check if you have provided the required parameters
-        if not check_dict_contains_keys(request_data,'user_email','conversation_from'):
+        if not check_dict_contains_keys(request_data,['user_email','conversation_from']):
             return response_message(False,"One of the required parameters is missing")
 
         #Check if you can get the other user
@@ -36,7 +36,7 @@ class MessengerView(APIView):
         try:
             user_other = app_models.User.objects.get(email=request_data['user_email'])
         except:
-            return response_message("The user_email does not correspond to a valid user")
+            return response_message(False,"The user_email does not correspond to a valid user")
 
         #Now that you have both, check that the other parameter is in a good format
         if not request_data['conversation_from'].isdigit():
