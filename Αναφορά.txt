@@ -47,6 +47,7 @@ python manage.py runserver
 Home page
 Network
 Conversations
+Notifications
 Settings
 Μερικώς:
 Account (χωρις τα skills)
