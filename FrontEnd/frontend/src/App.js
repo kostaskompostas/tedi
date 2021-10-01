@@ -13,11 +13,22 @@ class App extends Component {
 
     SignIn = (newToken) => {
         this.setState({ ...this.state, logged: true })
-        //this.state.helper.SetToken(newToken)
+
         const foo = (prevstate, newToken) => prevstate.helper.SetToken(newToken)
         foo(this.state, newToken)
-        return
-        ;<Redirect to="/home" />
+
+        //auth and set user info
+        this.state.helper.client
+            .get("/api/auth/", {
+                headers: { Authorization: "Token " + newToken },
+            })
+            .then((response) => {
+                console.log("APP LOGIN RESPONSE")
+                console.log(response.data.email)
+                this.setState({ userInfo: response.data })
+                console.log(this.state)
+                ;<Redirect to="/home" />
+            })
     }
 
     SignOut = () => {
@@ -49,6 +60,7 @@ class App extends Component {
     GetContent() {
         let content = this.state.logged ? (
             <LoggedInRouter
+                userInfo={this.state.userInfo}
                 myHelper={this.state.helper}
                 SignOut={this.SignOut}
             />

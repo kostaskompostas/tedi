@@ -1,9 +1,10 @@
 import { Avatar } from "../../util/util.js"
 import profilePic from "../../icons/profile.png"
 import { propTypes } from "react-bootstrap/esm/Image"
-
+import { React, useEffect, useState } from "react"
 export default function Profile(props) {
-    let connectionCounter = 0
+    const [connections, SetConnections] = useState()
+
     const connStyle = {
         overflowY: "auto",
         border: "3px solid black",
@@ -66,25 +67,23 @@ export default function Profile(props) {
                 <div className="d-flex flex-column mt-4">
                     <h2>Connections</h2>
                     <ul key="connections" style={connStyle} className="">
-                        {getConnections().map((person) => (
-                            <li
-                                key={"person" + connectionCounter++}
-                                className="d-flex p-2"
-                            >
-                                <Avatar
-                                    user_email={person.email}
-                                    myHelper={props.myHelper}
-                                    avatarUrl={profilePic}
-                                    width="40px"
-                                    height="40px"
-                                    userName={
-                                        person.first_name +
-                                        " " +
-                                        person.last_name
-                                    }
-                                />
-                            </li>
-                        ))}
+                        {props.userInfo.collaborators != undefined
+                            ? props.userInfo.collaborators.map((person) => (
+                                  <li key={person.email} className="d-flex p-2">
+                                      <Avatar
+                                          user_email={person.email}
+                                          myHelper={props.myHelper}
+                                          width="40px"
+                                          height="40px"
+                                          userName={
+                                              person.first_name +
+                                              " " +
+                                              person.last_name
+                                          }
+                                      />
+                                  </li>
+                              ))
+                            : null}
                     </ul>
                 </div>
             </div>

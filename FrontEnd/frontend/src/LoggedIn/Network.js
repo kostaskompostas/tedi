@@ -6,19 +6,52 @@ const Network = (props) => {
     const [searchString, SetSearchString] = useState("")
     const [searchResult, SetSearchResult] = useState()
 
+    const collaborators = props.userInfo.collaborators
+
+    //console.log(collaborators)
+    /*
+
+        filter search results
+        props.userinfo
+        //if user_email is not in collaborators and is not in pending requests
+            //show "connect"
+
+
+
+    */
     let client = props.myHelper.client
     console.log(props)
 
     useEffect(() => {
-        client.get("/api/user/").then(
-            (response) => {
-                SetUsers(response.data.items)
-                console.log(response.data.items)
-            },
-            (error) => console.log(error)
-        )
+        client
+            .get("/api/user/", {
+                headers: {
+                    Authorization: "Token " + props.myHelper.GetToken(),
+                },
+            })
+            .then(
+                (response) => {
+                    var temp = response.data.items
+                    //add "isconnected" value so it can be checked later
+                    //check if user is in collabs
+                    /*temp = temp.map((user) => {
+                    var flag = false
+                    for (let i = 0; i < collaborators.length; i++) {
+                        collaborators[i].email == user.email
+                        flag = true
+                        break
+                    }
+                    return { ...user, isConnected: flag }
+                })*/
+                    SetUsers(temp)
+                },
+                (error) => console.log(error)
+            )
     }, [])
-    useEffect(() => {}, [])
+
+    useEffect(() => {
+        console.log(users)
+    }, [users])
     const OnSearchChange = (e) => {
         var value = e.target.value.toLowerCase()
         var searchLength = value.length
@@ -38,6 +71,25 @@ const Network = (props) => {
             )
         )
     }
+
+    const OnConnect = (e, email) => {
+        e.preventDefault()
+        client
+            .post(
+                "api/collab/",
+                { create: true, user_email: email },
+                {
+                    headers: {
+                        Authorization: "Token " + props.myHelper.GetToken(),
+                    },
+                }
+            )
+            .then(
+                (response) => console.log(response.data),
+                (error) => console.log(error)
+            )
+    }
+
     return (
         <div className="d-flex flex-column justify-content-center">
             <input
@@ -56,9 +108,14 @@ const Network = (props) => {
                                 height={"40px"}
                                 width={"40px"}
                             />
-                            <button className="ms-2  btn-sm btn btn-success">
-                                connect
-                            </button>
+                            {!user.is_connected ? (
+                                <button
+                                    onClick={(e) => OnConnect(e, user.email)}
+                                    className="ms-2  btn-sm btn btn-success"
+                                >
+                                    connect
+                                </button>
+                            ) : null}
                         </div>
                     ))}
                 </div>

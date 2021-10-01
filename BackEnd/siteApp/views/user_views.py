@@ -16,7 +16,7 @@ def check_users_collaboration(user1,user2):
     #Try to find each other in the collaboration set
     return user2 in user1.collaborators.all()
 
-def convert_user_to_dictionary(user, see_private):
+def convert_user_to_dictionary(user, see_private,request=None):
     """This will convert a user model into a dictionary
     see_private is a boolean that when set to true, will make this function
     include the private data of the specific user. This should only be set
@@ -32,6 +32,8 @@ def convert_user_to_dictionary(user, see_private):
     except:
         final_dict['profile_picture'] = ''
 
+    if request != None and request.user.is_authenticated:
+        final_dict['is_connected'] = check_users_collaboration(user,request.user)
 
     #Write the public parts that need permission
     if not user.phone_private:
@@ -81,7 +83,7 @@ class UserView(APIView):
             return Response(convert_user_to_dictionary(user,collab))
 
         #If the user email was not specified, return a list of all users
-        return response_from_queryset(app_models.User.objects.filter(is_superuser=False,is_staff=False),lambda x: convert_user_to_dictionary(x,False))
+        return response_from_queryset(app_models.User.objects.filter(is_superuser=False,is_staff=False),lambda x: convert_user_to_dictionary(x,False,request))
 
     def post(self, request, format = None):
 
