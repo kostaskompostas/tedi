@@ -46,7 +46,7 @@ const NavBar = (props) => {
 
     const personalPages = [
         { url: "/notifications", name: "notifications", icon: notifications },
-        { url: "/account", name: "account", icon: profile },
+
         { url: "/settings", name: "settings", icon: fix },
     ]
 
@@ -55,7 +55,7 @@ const NavBar = (props) => {
         textDecoration: "none",
     }
 
-    return (
+    return props.userInfo != undefined ? (
         <nav>
             <ul className="nav-links" key="bazinga">
                 <Link key={"logoicon"} style={navStyle} to={"/home"}>
@@ -107,6 +107,24 @@ const NavBar = (props) => {
                         </li>
                     </Link>
                 ))}
+                <Link
+                    key={"account"}
+                    style={navStyle}
+                    to={{
+                        pathname: "/account",
+                        state: { viewUser: props.userInfo.email },
+                    }}
+                >
+                    <li className="d-flex align-items-center badge rounded-pill bg-primary">
+                        <img
+                            alt="empty img"
+                            width="40px"
+                            height="40px"
+                            src={profile}
+                        />
+                        {"account"}{" "}
+                    </li>
+                </Link>
                 <li key="logout">
                     <button
                         onClick={props.SignOut}
@@ -118,7 +136,7 @@ const NavBar = (props) => {
                 </li>
             </ul>
         </nav>
-    )
+    ) : null
 }
 
 export default NavBar
