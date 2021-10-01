@@ -12,6 +12,7 @@ def convert_message_to_dictionary(message):
         'order_id':message.order_id,
         'user_from_email':message.user_from.email,
         'user_to_email':message.user_to.email,
+        'content':message.content
     }
 
 class MessengerView(APIView):
